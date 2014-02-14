@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+
 #include "fe/types/BasicTypes.h"
+#include "fe/types/Alignment.h"
 
 namespace fe
 {
@@ -15,20 +17,6 @@ extern const UI32 K_INVALID_ORDER;
 extern const Joint InvalidJoint;
 
 typedef std::vector<Joint> TJointVec;
-
-enum class THAlign
-{
-	LEFT,
-	CENTER,
-	RIGHT
-};
-
-enum class TVAlign
-{
-	TOP,
-	CENTER,
-	BOTTOM
-};
 
 class Joint
 {
