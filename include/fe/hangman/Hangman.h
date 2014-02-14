@@ -1,33 +1,38 @@
 #ifndef __HANGMAN_H__
 #define __HANGMAN_H__
 
+#include <memory>
 #include "fe/hangman/BodyPart.h"
-#include "fe/hangman/BodyPartChecker.h"
-#include "fe/hangman/BodyBuilder.h"
 
 namespace fe
 {
 
-typedef std::vector<sf::Sprite> TSpriteVec;
+class Hangman;
+
+typedef std::vector<sf::Sprite>  TSpriteVec;
+typedef std::shared_ptr<Hangman> THangmanShPtr;
 
 class Hangman
 {
+
+friend class HangmanFactory;
+
 private:
-	sf::Texture  m_Texture;
-	TBodyPartVec m_BodyParts;
+	UI32 		 m_LastShown;
 	TSpriteVec   m_Hangman;
+	sf::Texture  m_Texture;
 
 	Hangman(const Hangman& toCopy);
 	Hangman& operator=(const Hangman& toCopy);
-
-public:
-	Hangman(const std::string& textureFile);
+	Hangman();
 	~Hangman();
-
-	bool BuildFromBodyParts(const TBodyPartVec& bodyParts,
-		const sf::Vector2f& position = sf::Vector2f(0, 0));
+	
+public:
+	bool ShowNextBodyPart();
+	void HideAllBodyParts();
 	void Draw(sf::RenderWindow& window) const;
 
+	void SetPosition(const sf::Vector2f& position);
 	void PrintDebug(const std::string& spaces = "") const;
 };
 

@@ -1,4 +1,4 @@
-#include "fe/hangman/BodyPartChecker.h"
+#include "fe/hangman/factory/BodyPartChecker.h"
 
 using namespace std;
 
