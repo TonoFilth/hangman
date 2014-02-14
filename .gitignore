@@ -3,6 +3,7 @@ bin/
 lib/
 .obj/
 .obj_tests/
+doc/*
 trash/
 
 # FILES
