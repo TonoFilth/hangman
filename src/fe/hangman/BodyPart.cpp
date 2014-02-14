@@ -7,9 +7,36 @@ namespace fe
 {
 
 // =============================================================================
+//	CONSTANTS
+// =============================================================================
+const BodyPart InvalidBodyPart(K_INVALID_ORDER, IntRect(0, 0, 0, 0));
+
+// =============================================================================
+//	NON-MEMBER FUNCTIONS
+// =============================================================================
+const BodyPart& FindBodyPartByOrder(const TBodyPartVec& bodyParts, const UI32 order)
+{
+	for (auto& bodyPart : bodyParts)
+		if (bodyPart.GetOrder() == order)
+			return bodyPart;
+
+	return InvalidBodyPart;
+}
+
+const Joint& FindJointByOrder(const TBodyPartVec& bodyParts, const UI32 order)
+{
+	for (auto& bodyPart : bodyParts)
+		for (auto& joint : bodyPart.GetJoints())
+			if (joint.GetOrder() == order)
+				return joint;
+
+	return InvalidJoint;
+}
+
+// =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-BodyPart::BodyPart(UI32 bOrder, const sf::IntRect& txCoords) :
+BodyPart::BodyPart(UI32 bOrder, const IntRect& txCoords) :
 	m_Order(bOrder),
 	m_TxCoords(txCoords)
 {
@@ -78,6 +105,14 @@ TOrderVec BodyPart::GetJointOrders() const
 TJointVec BodyPart::GetJoints() const
 {
 	return m_Joints;
+}
+
+// =============================================================================
+//	QUESTION METHODS
+// =============================================================================
+bool BodyPart::IsValid() const
+{
+	return m_Order != InvalidBodyPart.m_Order;
 }
 
 // =============================================================================

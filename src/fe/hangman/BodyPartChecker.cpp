@@ -6,11 +6,6 @@ namespace fe
 {
 
 // =============================================================================
-//	CONSTANTS
-// =============================================================================
-const UI32 K_ROOT_ORDER = 0;
-
-// =============================================================================
 //	STATIC METHODS
 // =============================================================================
 bool BodyPartChecker::Check(const TBodyPartVec& bodyParts)
@@ -35,6 +30,13 @@ bool BodyPartChecker::Check(const TBodyPartVec& bodyParts)
 	for (auto& bodyPart : bodyParts)
 		if (!CheckJoints(bodyPart, jointOrders))
 			return false;
+
+	if (!CheckInvalidOrder(bodyPartOrders) || !CheckInvalidOrder(jointOrders))
+	{
+		cerr << "Invalid body part order detected " << K_INVALID_ORDER << endl;
+		cerr << "This order is reserved. Try with another one." << endl;
+		return false;
+	}
 
 	CheckMissingReferences(bodyParts, bodyPartOrders, jointOrders);
 
@@ -64,6 +66,11 @@ bool BodyPartChecker::CheckJoints(const BodyPart& bodyPart, TOrderVec& orders)
 			orders.push_back(joint.GetOrder());
 
 	return true;
+}
+
+bool BodyPartChecker::CheckInvalidOrder(const TOrderVec& orders)
+{
+	return (find(orders.begin(), orders.end(), K_INVALID_ORDER) == orders.end());
 }
 
 void BodyPartChecker::CheckMissingReferences(const TBodyPartVec& bodyParts,

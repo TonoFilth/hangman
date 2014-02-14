@@ -16,6 +16,8 @@ Hangman::Hangman(const string& textureFile)
 		cerr << "Can't load texture: " << textureFile << endl;
 		throw;
 	}
+
+	m_Texture.setSmooth(true);
 }
 
 Hangman::~Hangman()
@@ -25,7 +27,7 @@ Hangman::~Hangman()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-bool Hangman::BuildFromBodyParts(const TBodyPartVec& bodyParts)
+bool Hangman::BuildFromBodyParts(const TBodyPartVec& bodyParts, const Vector2f& position)
 {
 	if (!BodyPartChecker::Check(bodyParts))
 	{
@@ -34,8 +36,15 @@ bool Hangman::BuildFromBodyParts(const TBodyPartVec& bodyParts)
 	}
 
 	m_BodyParts = bodyParts;
+	BodyBuilder::Build(bodyParts, m_Texture, position, m_Hangman);
 
 	return true;
+}
+
+void Hangman::Draw(RenderWindow& window) const
+{
+	for (auto& sprite : m_Hangman)
+		window.draw(sprite);
 }
 
 // =============================================================================

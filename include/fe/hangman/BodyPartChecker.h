@@ -12,6 +12,7 @@ class BodyPartChecker
 private:
 	static bool CheckBodyParts(const TBodyPartVec& bodyParts, TOrderVec& orders);
 	static bool CheckJoints(const BodyPart& bodyPart, TOrderVec& orders);
+	static bool CheckInvalidOrder(const TOrderVec& orders);
 	static void CheckMissingReferences(const TBodyPartVec& bodyParts,
 		const TOrderVec& bpOrders, const TOrderVec& jOrders);
 

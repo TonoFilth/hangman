@@ -11,8 +11,13 @@ namespace fe
 
 class BodyPart;
 
+extern const BodyPart InvalidBodyPart;
+
 typedef std::vector<BodyPart> TBodyPartVec;
 typedef std::vector<UI32>  	  TOrderVec;
+
+const BodyPart& FindBodyPartByOrder(const TBodyPartVec& bodyParts, const UI32 order);
+const Joint& FindJointByOrder(const TBodyPartVec& bodyParts, const UI32 order);
 
 class BodyPart
 {
@@ -30,11 +35,13 @@ public:
 	~BodyPart();
 
 	void AddJoint(const Joint& joint);
+
 	UI32 GetOrder() const;
 	sf::IntRect GetTextureCoords() const;
 	TOrderVec GetJointOrders() const;
 	TJointVec GetJoints() const;
 
+	bool IsValid() const;
 	void PrintDebug(const std::string& spaces = "") const;
 };
 

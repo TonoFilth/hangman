@@ -3,6 +3,7 @@
 
 #include "fe/hangman/BodyPart.h"
 #include "fe/hangman/BodyPartChecker.h"
+#include "fe/hangman/BodyBuilder.h"
 
 namespace fe
 {
@@ -23,7 +24,8 @@ public:
 	Hangman(const std::string& textureFile);
 	~Hangman();
 
-	bool BuildFromBodyParts(const TBodyPartVec& bodyParts);
+	bool BuildFromBodyParts(const TBodyPartVec& bodyParts,
+		const sf::Vector2f& position = sf::Vector2f(0, 0));
 	void Draw(sf::RenderWindow& window) const;
 
 	void PrintDebug(const std::string& spaces = "") const;
