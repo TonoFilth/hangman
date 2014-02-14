@@ -1,6 +1,7 @@
 #ifndef __JOINT_H__
 #define __JOINT_H__
 
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "fe/types/BasicTypes.h"
 
@@ -23,6 +24,8 @@ public:
 
 	UI32 GetOrder() const;
 	sf::Vector2f GetCoords() const;
+
+	void PrintDebug(const std::string& spaces = "") const;
 };
 
 }

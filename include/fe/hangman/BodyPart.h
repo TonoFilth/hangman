@@ -19,6 +19,8 @@ private:
 	sf::IntRect  m_TxCoords;
 	TJointVec 	 m_Joints;
 
+	void Copy(const BodyPart& toCopy);
+
 public:
 	BodyPart(UI32 bOrder, const sf::IntRect& txCoords);
 	BodyPart(const BodyPart& toCopy);
@@ -30,6 +32,8 @@ public:
 	sf::IntRect GetTextureCoords() const;
 	TOrderVec GetJointOrders() const;
 	TJointVec GetJoints() const;
+
+	void PrintDebug(const std::string& spaces = "") const;
 };
 
 }

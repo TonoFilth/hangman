@@ -1,5 +1,6 @@
 #include "fe/hangman/Joint.h"
 
+using namespace std;
 using namespace sf;
 
 namespace fe
@@ -25,7 +26,7 @@ Joint& Joint::operator=(const Joint& toCopy)
 		return *this;
 
 	Copy(toCopy);
-	
+
 	return *this;
 }
 
@@ -53,6 +54,16 @@ UI32 Joint::GetOrder() const
 Vector2f Joint::GetCoords() const
 {
 	return m_Coords;
+}
+
+// =============================================================================
+//	DEBUG METHODS
+// =============================================================================
+void Joint::PrintDebug(const std::string& spaces) const
+{
+	cout << spaces << "Joint" << endl;
+	cout << spaces << "  Order:  " << m_Order << endl;
+	cout << spaces << "  Coords:  (" << m_Coords.x << " , " << m_Coords.y << ")" << endl;
 }
 
 }

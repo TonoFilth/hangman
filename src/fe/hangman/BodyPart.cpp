@@ -1,5 +1,6 @@
 #include "fe/hangman/BodyPart.h"
 
+using namespace std;
 using namespace sf;
 
 namespace fe
@@ -14,8 +15,33 @@ BodyPart::BodyPart(UI32 bOrder, const sf::IntRect& txCoords) :
 {
 }
 
+BodyPart::BodyPart(const BodyPart& toCopy)
+{
+	Copy(toCopy);
+}
+
+BodyPart& BodyPart::operator=(const BodyPart& toCopy)
+{
+	if (this == &toCopy)
+		return *this;
+
+	Copy(toCopy);
+
+	return *this;
+}
+
 BodyPart::~BodyPart()
 {
+}
+
+// =============================================================================
+//	PRIVATE AND PROTECTED METHODS
+// =============================================================================
+void BodyPart::Copy(const BodyPart& toCopy)
+{
+	m_Order    = toCopy.m_Order;
+	m_TxCoords = toCopy.m_TxCoords;
+	m_Joints   = toCopy.m_Joints;
 }
 
 // =============================================================================
@@ -52,6 +78,22 @@ TOrderVec BodyPart::GetJointOrders() const
 TJointVec BodyPart::GetJoints() const
 {
 	return m_Joints;
+}
+
+// =============================================================================
+//	DEBUG METHODS
+// =============================================================================
+void BodyPart::PrintDebug(const std::string& spaces) const
+{
+	cout << spaces << "BodyPart " << endl;
+	cout << spaces << "  Order:    " << m_Order << endl;
+	cout << spaces << "  TxCoords: LT: (";
+	cout << m_TxCoords.left << " , " << m_TxCoords.top << ")";
+	cout << " WH: (";
+	cout << m_TxCoords.width << " , " << m_TxCoords.height << ")" << endl;
+
+	for (auto& joint : m_Joints)
+		joint.PrintDebug(spaces + "  ");
 }
 
 }

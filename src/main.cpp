@@ -1,5 +1,5 @@
 #include <iostream>
-#include "fe/hangman/BodyPart.h"
+#include "fe/hangman/Hangman.h"
 
 using namespace std;
 using namespace sf;
@@ -52,10 +52,15 @@ int main(int argc, char** argv)
 	bp2.AddJoint(j3);
 	bp2.AddJoint(j4);
 
-	//PrintOrderVec(bp1.GetJointOrders());
-	//PrintOrderVec(bp2.GetJointOrders());
-	PrintBodyPart(bp1);
-	PrintBodyPart(bp2);
+	Hangman hangman("mytexture.png");
+	TBodyPartVec bpVec;
+
+	bpVec.push_back(bp1);
+	bpVec.push_back(bp2);
+
+	hangman.BuildFromBodyParts(bpVec);
+
+	hangman.PrintDebug();
 
 	return 0;
 }
