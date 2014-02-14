@@ -31,7 +31,7 @@ THangmanShPtr HangmanFactory::CreateFromFile(const std::string& fileName)
 	string 		 txFileName;
 	TBodyPartVec bodyParts;
 
-	THangmanShPtr hangman = make_shared<Hangman>();
+	THangmanShPtr hangman(new Hangman());
 
 	// Extract body parts
 	if (!m_BodyPartExtractor->Extract(fileName, txFileName, bodyParts))

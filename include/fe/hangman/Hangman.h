@@ -25,9 +25,10 @@ private:
 	Hangman(const Hangman& toCopy);
 	Hangman& operator=(const Hangman& toCopy);
 	Hangman();
+
+public:
 	~Hangman();
 	
-public:
 	bool ShowNextBodyPart();
 	void HideAllBodyParts();
 	void Draw(sf::RenderWindow& window) const;
