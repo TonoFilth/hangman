@@ -1,13 +1,11 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# FOLDERS
+bin/
+lib/
+.obj/
+.obj_tests/
+trash/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# FILES
+a.out
+*.psd
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
