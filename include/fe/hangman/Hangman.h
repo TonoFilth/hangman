@@ -2,11 +2,11 @@
 #define __HANGMAN_H__
 
 #include "fe/hangman/BodyPart.h"
+#include "fe/hangman/BodyPartChecker.h"
 
 namespace fe
 {
 
-typedef std::vector<BodyPart> 	TBodyPartVec;
 typedef std::vector<sf::Sprite> TSpriteVec;
 
 class Hangman
@@ -23,7 +23,7 @@ public:
 	Hangman(const std::string& textureFile);
 	~Hangman();
 
-	void BuildFromBodyParts(const TBodyPartVec& bodyParts);
+	bool BuildFromBodyParts(const TBodyPartVec& bodyParts);
 	void Draw(sf::RenderWindow& window) const;
 
 	void PrintDebug(const std::string& spaces = "") const;

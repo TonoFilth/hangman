@@ -63,7 +63,7 @@ void Joint::PrintDebug(const std::string& spaces) const
 {
 	cout << spaces << "Joint" << endl;
 	cout << spaces << "  Order:  " << m_Order << endl;
-	cout << spaces << "  Coords:  (" << m_Coords.x << " , " << m_Coords.y << ")" << endl;
+	cout << spaces << "  Coords: (" << m_Coords.x << " , " << m_Coords.y << ")" << endl;
 }
 
 }

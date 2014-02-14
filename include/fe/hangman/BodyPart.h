@@ -9,8 +9,10 @@
 namespace fe
 {
 
-typedef std::vector<Joint> TJointVec;
-typedef std::vector<UI32>  TOrderVec;
+class BodyPart;
+
+typedef std::vector<BodyPart> TBodyPartVec;
+typedef std::vector<UI32>  	  TOrderVec;
 
 class BodyPart
 {

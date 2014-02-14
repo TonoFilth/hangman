@@ -11,6 +11,11 @@ namespace fe
 // =============================================================================
 Hangman::Hangman(const string& textureFile)
 {
+	if (!m_Texture.loadFromFile(textureFile))
+	{
+		cerr << "Can't load texture: " << textureFile << endl;
+		throw;
+	}
 }
 
 Hangman::~Hangman()
@@ -20,9 +25,17 @@ Hangman::~Hangman()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-void Hangman::BuildFromBodyParts(const TBodyPartVec& bodyParts)
+bool Hangman::BuildFromBodyParts(const TBodyPartVec& bodyParts)
 {
+	if (!BodyPartChecker::Check(bodyParts))
+	{
+		cerr << "Malformed body parts" << endl;
+		return false;
+	}
+
 	m_BodyParts = bodyParts;
+
+	return true;
 }
 
 // =============================================================================

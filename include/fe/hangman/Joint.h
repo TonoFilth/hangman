@@ -8,6 +8,10 @@
 namespace fe
 {
 
+class Joint;
+
+typedef std::vector<Joint> TJointVec;
+
 class Joint
 {
 private:
