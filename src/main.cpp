@@ -46,12 +46,12 @@ int main(int argc, char** argv)
 
 	bool nextWord = false;
 
-	WordViewer wViewer(fPtr, txPtr);
+	WordViewer wViewer(500, 50, fPtr, txPtr);
 	wViewer.SetWord(Word("ABABAB"));
 
 	//LetterPicker picker(Vector2f(40, 40), 6, f);
 	LetterPicker picker(500, 100, 18, fPtr);
-	//picker.SetPosition(Vector2f(250, 200));
+	picker.SetPosition(Vector2f(0, 400));
 	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお", f);
 	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ");
 	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const wchar_t c)

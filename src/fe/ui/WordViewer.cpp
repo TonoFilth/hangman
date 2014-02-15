@@ -9,12 +9,16 @@ namespace fe
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-WordViewer::WordViewer(const TFontPtr& font, const TTexturePtr& lUndTexture) :
+WordViewer::WordViewer(const UI32 width, const UI32 height, const TFontPtr& font,
+	const TTexturePtr& lUndTexture) :
 	m_Word("undefined"),
+	m_Size(width, height),
+	m_Position(0, 0),
 	m_Callback(nullptr),
 	m_LetterFont(font),
-	m_LetterSize(30, 30),
-	m_LetterPadding(0, 0, 10, 0),
+	m_LetterSize(0, 0),
+	m_LetterPadding(5, 0, 5, 0),
+	m_UnderlineMargin(5),
 	m_UnderlineTexture(lUndTexture)
 {
 }
@@ -31,15 +35,26 @@ void WordViewer::GenerateLetters()
 	m_UnderlineSprites.clear();
 
 	auto letterCount = m_Word.GetWord().getSize();
+	auto txSize = m_UnderlineTexture->getSize();
 	auto word = m_Word.GetWord();
 
-	Vector2f curPos(m_LetterPadding.left, m_LetterPadding.top + 220);
+	Vector2f drawableArea(
+		m_Size.x - (m_LetterPadding.left + m_LetterPadding.width) * letterCount,
+		m_Size.y - txSize.y - m_UnderlineMargin - m_LetterPadding.top - m_LetterPadding.height);
+
+	m_LetterSize.x = drawableArea.x / static_cast<F32>(letterCount);
+	m_LetterSize.y = drawableArea.y;
+
+	cout << m_LetterSize.x << " " << letterCount << endl;
+
+	Vector2f curPos(m_LetterPadding.left + m_Position.x,
+					m_LetterPadding.top  + m_Position.y);
 
 	for (UI32 i = 0; i < letterCount; ++i)
 	{
 		if (word[i] == L' ')
 		{
-			curPos.x += m_LetterSize.x + m_LetterPadding.width;
+			curPos.x += m_LetterSize.x + m_LetterPadding.left + m_LetterPadding.width;
 			continue;
 		}
 
@@ -47,8 +62,11 @@ void WordViewer::GenerateLetters()
 		LetterButton letter(word[i], *m_LetterFont, m_LetterSize);
 
 		letter.SetPosition(curPos);
+		letter.SetLetterColor(Color::Black);
+		letter.SetButtonColor(Color(0, 0, 0, 0));
+
 		undSprite.setPosition(curPos.x,
-			curPos.y + m_LetterSize.y + m_LetterPadding.top + m_LetterPadding.height + 5);
+			curPos.y + m_LetterSize.y + m_LetterPadding.top + m_LetterPadding.height + m_UnderlineMargin);
 
 		auto txSize = m_UnderlineTexture->getSize();
 
@@ -62,7 +80,7 @@ void WordViewer::GenerateLetters()
 		m_HiddenLetterList.push_back(letter);
 		m_UnderlineSprites.push_back(undSprite);
 
-		curPos.x += m_LetterSize.x + m_LetterPadding.width;
+		curPos.x += m_LetterSize.x + m_LetterPadding.left + m_LetterPadding.width;
 	}
 }
 

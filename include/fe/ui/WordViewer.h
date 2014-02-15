@@ -21,11 +21,14 @@ class WordViewer
 {
 private:
 	Word 			   m_Word;
+	sf::Vector2f 	   m_Size;
+	sf::Vector2f	   m_Position;
 	TTryLetterCallback m_Callback;
 
 	TFontPtr	  m_LetterFont;
 	sf::Vector2f  m_LetterSize;
 	sf::FloatRect m_LetterPadding;
+	F32			  m_UnderlineMargin;
 
 	TTexturePtr m_UnderlineTexture;
 	TSpriteList m_UnderlineSprites;
@@ -39,7 +42,8 @@ private:
 	WordViewer& operator=(const WordViewer& toCopy);
 
 public:
-	WordViewer(const TFontPtr& font, const TTexturePtr& lUndTexture);
+	WordViewer(const UI32 width, const UI32 height, const TFontPtr& font,
+		const TTexturePtr& lUndTexture);
 	~WordViewer();
 
 	bool TryLetter(const wchar_t letter);

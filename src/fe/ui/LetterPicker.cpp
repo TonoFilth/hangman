@@ -66,16 +66,16 @@ void LetterPicker::SetLetters(const String& letters)
 	m_Rows = ceil(letters.getSize() / static_cast<F32>(m_Cols));
 
 	// Compute the picker actual drawable size
-	m_PickerDrawableSize = Vector2f(
+	Vector2f drawableArea(
 		m_PickerSize.x - (m_ButtonPadding.left + m_ButtonPadding.width) * m_Cols,
 		m_PickerSize.y - (m_ButtonPadding.top + m_ButtonPadding.height + m_LineSpacing) * m_Rows);
 
 	// Last row doesn't have line spacing
-	m_PickerDrawableSize.y += m_LineSpacing;
+	drawableArea.y += m_LineSpacing;
 
 	// Define the letter button's size
-	m_ButtonSize = Vector2f(m_PickerDrawableSize.x / static_cast<F32>(m_Cols),
-							m_PickerDrawableSize.y / static_cast<F32>(m_Rows));
+	m_ButtonSize = Vector2f(drawableArea.x / static_cast<F32>(m_Cols),
+							drawableArea.y / static_cast<F32>(m_Rows));
 
 	for (UI32 i = 0; i < m_Rows; ++i)
 	{
@@ -91,12 +91,8 @@ void LetterPicker::SetLetters(const String& letters)
 
 			++curLetter;
 			if (curLetter == letters.getSize())
-			//	break;
 				return;
 		}
-
-		//if (curLetter == letters.getSize())
-		//	break;
 
 		curPos.x = m_PickerPosition.x + m_ButtonPadding.left;
 		curPos.y += m_ButtonPadding.top + m_ButtonPadding.height +

@@ -18,10 +18,8 @@ private:
 
 	sf::Vector2f m_ButtonSize;
 	sf::Vector2f m_PickerSize;
-	sf::Vector2f m_PickerDrawableSize;
 	sf::Vector2f m_PickerPosition;
 
-	//sf::Font      m_Font;
 	TFontPtr	  m_Font;
 	THAlign 	  m_Alignment;
 	UI32 	   	  m_LineSpacing;
