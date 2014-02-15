@@ -1,4 +1,4 @@
-#include "fe/words/WordViewer.h"
+#include "fe/ui/WordViewer.h"
 
 using namespace std;
 using namespace sf;
@@ -53,10 +53,10 @@ void WordViewer::GenerateLetters()
 		auto txSize = m_UnderlineTexture->getSize();
 
 		// Adjust the underline sprite's width
-		if (txSize.x > m_LetterSize.x)
+		if (txSize.x != m_LetterSize.x)
 		{
 			auto scale = m_LetterSize.x / static_cast<F32>(txSize.x);
-			undSprite.setScale(scale, scale);
+			undSprite.setScale(scale, 1.0);
 		}
 
 		m_HiddenLetterList.push_back(letter);

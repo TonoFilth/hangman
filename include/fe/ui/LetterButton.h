@@ -39,6 +39,7 @@ public:
 	void Draw(sf::RenderWindow& window) const;
 
 	wchar_t GetLetter() const;
+	sf::Vector2f GetPosition() const;
 
 	void SetLetter(const wchar_t letter);
 	void SetLetterColor(const sf::Color& color);

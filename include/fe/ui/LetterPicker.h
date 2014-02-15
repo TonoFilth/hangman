@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "fe/ui/LetterButton.h"
+#include "fe/types/PointerTypes.h"
 
 namespace fe
 {
@@ -17,11 +18,14 @@ private:
 
 	sf::Vector2f m_ButtonSize;
 	sf::Vector2f m_PickerSize;
+	sf::Vector2f m_PickerDrawableSize;
 	sf::Vector2f m_PickerPosition;
 
-	sf::Font      m_Font;
+	//sf::Font      m_Font;
+	TFontPtr	  m_Font;
 	THAlign 	  m_Alignment;
 	UI32 	   	  m_LineSpacing;
+	F32			  m_LetterScale;
 	sf::FloatRect m_ButtonPadding;
 
 	TLetterCallback   m_LetterCallback;
@@ -33,15 +37,16 @@ private:
 	LetterPicker& operator=(const LetterPicker& toCopy);
 
 public:
-	LetterPicker(const sf::Vector2f& buttonSize, const UI32 cols, const sf::Font& font);
+	LetterPicker(const UI32 width, const UI32 height, const UI32 cols, const TFontPtr& font);
 	~LetterPicker();
 
 	void HandleInput(const sf::RenderWindow& window);
 	void Draw(sf::RenderWindow& window) const;
 
-	void SetLetters(const sf::String& letters, const sf::Font& font);
+	void SetLetters(const sf::String& letters);
 	void SetLetterColor(const sf::Color& color);
 	void SetLetterCallback(const TLetterCallback& callback);
+	void SetPosition(const sf::Vector2f& position);
 };
 
 }

@@ -9,39 +9,24 @@ namespace fe
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-LetterPicker::LetterPicker(const Vector2f& buttonSize, const UI32 cols, const Font& font) :
+LetterPicker::LetterPicker(const UI32 width, const UI32 height, const UI32 cols,
+	const TFontPtr& font) :
 	m_Rows(0),
 	m_Cols(cols),
-	m_ButtonSize(buttonSize),
-	m_PickerSize(0, 0),
-	m_PickerPosition(160, 280),
+	m_ButtonSize(0, 0),
+	m_PickerSize(width, height),
+	m_PickerPosition(0, 0),
 	m_Font(font),
 	m_Alignment(THAlign::CENTER),
 	m_LineSpacing(0),
+	m_LetterScale(0.8),
 	m_ButtonPadding(0, 0, 0, 0),
 	m_LetterCallback(nullptr)
 {
-	if (m_Cols == 0)
-		m_Cols = 1;
 }
 
 LetterPicker::~LetterPicker()
 {
-}
-
-// =============================================================================
-//	PRIVATE AND PROTECTED METHODS
-// =============================================================================
-void LetterPicker::ComputePickerSize()
-{
-	m_PickerSize.x = (m_ButtonPadding.left + m_ButtonPadding.width) * m_Cols +
-					  m_Cols * m_ButtonSize.x;
-	m_PickerSize.y = (m_ButtonPadding.top + m_ButtonPadding.height +
-					  m_LineSpacing) * m_Rows + m_Rows * m_ButtonSize.y;
-
-	// Substract one line spacing because the last
-	// button line doesn't have line spacing at bottom
-	m_PickerSize.y -= m_LineSpacing;
 }
 
 // =============================================================================
@@ -70,25 +55,33 @@ void LetterPicker::Draw(RenderWindow& window) const
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-void LetterPicker::SetLetters(const String& letters, const sf::Font& font)
+void LetterPicker::SetLetters(const String& letters)
 {
-	F32 lScale = 0.8;
-
 	Vector2f curPos(m_PickerPosition);
 	curPos.x += m_ButtonPadding.left;
 	curPos.y += m_ButtonPadding.top;
 
 	UI32 curLetter = 0;
-	UI32 rowWidth = (m_ButtonPadding.left + m_ButtonPadding.width +
-					 m_ButtonSize.x) * m_Cols;
-
+	
 	m_Rows = ceil(letters.getSize() / static_cast<F32>(m_Cols));
+
+	// Compute the picker actual drawable size
+	m_PickerDrawableSize = Vector2f(
+		m_PickerSize.x - (m_ButtonPadding.left + m_ButtonPadding.width) * m_Cols,
+		m_PickerSize.y - (m_ButtonPadding.top + m_ButtonPadding.height + m_LineSpacing) * m_Rows);
+
+	// Last row doesn't have line spacing
+	m_PickerDrawableSize.y += m_LineSpacing;
+
+	// Define the letter button's size
+	m_ButtonSize = Vector2f(m_PickerDrawableSize.x / static_cast<F32>(m_Cols),
+							m_PickerDrawableSize.y / static_cast<F32>(m_Rows));
 
 	for (UI32 i = 0; i < m_Rows; ++i)
 	{
 		for (UI32 j = 0; j < m_Cols; ++j)
 		{
-			LetterButton button(letters[curLetter], font, m_ButtonSize, lScale);
+			LetterButton button(letters[curLetter], *m_Font, m_ButtonSize, m_LetterScale);
 			button.SetPosition(curPos);
 			button.SetCallback(m_LetterCallback);
 
@@ -98,23 +91,24 @@ void LetterPicker::SetLetters(const String& letters, const sf::Font& font)
 
 			++curLetter;
 			if (curLetter == letters.getSize())
-				break;
+			//	break;
+				return;
 		}
 
-		if (curLetter == letters.getSize())
-			break;
+		//if (curLetter == letters.getSize())
+		//	break;
 
 		curPos.x = m_PickerPosition.x + m_ButtonPadding.left;
 		curPos.y += m_ButtonPadding.top + m_ButtonPadding.height +
 			m_LineSpacing + m_ButtonSize.y;
 
-		// Calculate center
+		// Set last row's alignment
 		if (i + 2 == m_Rows)
 		{
 			UI32 remainingLetters = letters.getSize() - (i + 1) * m_Cols;
 			UI32 spaceToFill = remainingLetters * (m_ButtonPadding.left +
 				m_ButtonPadding.width + m_ButtonSize.x);
-			UI32 emptySpace = rowWidth - spaceToFill;
+			UI32 emptySpace = m_PickerSize.x - spaceToFill;
 
 			switch (m_Alignment)
 			{
@@ -127,8 +121,6 @@ void LetterPicker::SetLetters(const String& letters, const sf::Font& font)
 			curPos.x += m_PickerPosition.x;
 		}
 	}
-
-	ComputePickerSize();
 }
 
 void LetterPicker::SetLetterColor(const Color& color)
@@ -143,6 +135,23 @@ void LetterPicker::SetLetterCallback(const TLetterCallback& callback)
 
 	for (auto& button : m_Buttons)
 		button.SetCallback(callback);
+}
+
+void LetterPicker::SetPosition(const Vector2f& position)
+{
+	m_PickerPosition = position;
+
+	if (m_Buttons.empty())
+		return;
+
+	Vector2f diff(position.x - m_Buttons.front().GetPosition().x,
+				  position.y - m_Buttons.front().GetPosition().y);
+
+	for (auto& button : m_Buttons)
+	{
+		auto bPos = button.GetPosition();
+		button.SetPosition(Vector2f(bPos.x + diff.x, bPos.y + diff.y));
+	}
 }
 
 }

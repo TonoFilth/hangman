@@ -120,6 +120,11 @@ wchar_t LetterButton::GetLetter() const
 	return m_Letter.getString()[0];
 }
 
+Vector2f LetterButton::GetPosition() const
+{
+	return m_Button.getPosition();
+}
+
 void LetterButton::SetLetter(const wchar_t letter)
 {
 	m_Letter.setString(letter);

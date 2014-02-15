@@ -7,7 +7,7 @@
 #include "fe/words/StubWordProvider.h"
 #include "fe/ui/LetterButton.h"
 #include "fe/ui/LetterPicker.h"
-#include "fe/words/WordViewer.h"
+#include "fe/ui/WordViewer.h"
 
 using namespace std;
 using namespace sf;
@@ -49,9 +49,11 @@ int main(int argc, char** argv)
 	WordViewer wViewer(fPtr, txPtr);
 	wViewer.SetWord(Word("ABABAB"));
 
-	LetterPicker picker(Vector2f(40, 40), 6, f);
+	//LetterPicker picker(Vector2f(40, 40), 6, f);
+	LetterPicker picker(500, 100, 18, fPtr);
+	//picker.SetPosition(Vector2f(250, 200));
 	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお", f);
-	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", f);
+	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ");
 	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const wchar_t c)
 	{
 		//cout << String(c).toAnsiString() << endl;
