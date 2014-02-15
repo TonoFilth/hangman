@@ -20,7 +20,7 @@ LetterPicker::LetterPicker(const UI32 width, const UI32 height, const UI32 cols,
 	m_Alignment(THAlign::CENTER),
 	m_LineSpacing(0),
 	m_LetterScale(0.8),
-	m_ButtonPadding(0, 0, 0, 0),
+	m_ButtonPadding(2, 2, 0, 2),
 	m_LetterCallback(nullptr)
 {
 }

@@ -45,8 +45,6 @@ void WordViewer::GenerateLetters()
 	m_LetterSize.x = drawableArea.x / static_cast<F32>(letterCount);
 	m_LetterSize.y = drawableArea.y;
 
-	cout << m_LetterSize.x << " " << letterCount << endl;
-
 	Vector2f curPos(m_LetterPadding.left + m_Position.x,
 					m_LetterPadding.top  + m_Position.y);
 

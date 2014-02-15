@@ -20,11 +20,17 @@ LetterButton::LetterButton(const wchar_t letter, const Font& font,
 	m_Letter.setColor(Color::White);
 
 	FitLetter(letterScale);
-	TransformableSetOrigin(m_Letter, THAlign::CENTER, TVAlign::CENTER);
+	//TransformableSetOrigin(m_Letter, THAlign::CENTER, TVAlign::CENTER);
 
 	auto bPos(m_Button.getPosition());
-	m_Letter.setPosition(bPos.x + buttonSize.x  * 0.5,
-						 bPos.y + buttonSize.y  * 0.5);
+	auto lBounds(m_Letter.getLocalBounds());
+
+	//Vector2f letterPos(bPos.x + buttonSize.x  * 0.5,
+	//				   bPos.y + buttonSize.y  * 0.5);
+	Vector2f letterPos(bPos.x + buttonSize.x * 0.5 - (lBounds.width + lBounds.left) * 0.5,
+					   bPos.y + buttonSize.y * 0.5 - (lBounds.height + lBounds.top) * 0.5 - lBounds.top * 0.5);
+
+	m_Letter.setPosition(letterPos);
 }
 
 LetterButton::LetterButton(const LetterButton& toCopy)
@@ -110,6 +116,30 @@ void LetterButton::Draw(RenderWindow& window) const
 {
 	window.draw(m_Button);
 	window.draw(m_Letter);
+
+	// DEBUG RECTANGLES
+	/*
+	auto lBounds = m_Letter.getLocalBounds();
+
+	auto glyph = m_Letter.getFont()->getGlyph(m_Letter.getString()[0], m_Letter.getCharacterSize(), false);
+	RectangleShape sh(
+		Vector2f(glyph.bounds.width,
+				 lBounds.top));
+	sh.setFillColor(Color(0, 0, 0, 0));
+	sh.setOutlineColor(Color::Magenta);
+	sh.setOutlineThickness(1.0);
+	sh.setPosition(m_Letter.getPosition());
+	window.draw(sh);
+
+	RectangleShape shape(
+		Vector2f(lBounds.width + lBounds.left,
+				 lBounds.height + lBounds.top));
+	shape.setFillColor(Color(0, 0, 0, 0));
+	shape.setOutlineColor(Color::Red);
+	shape.setOutlineThickness(1.0);
+	shape.setPosition(m_Letter.getPosition());
+	window.draw(shape);
+	*/
 }
 
 // =============================================================================
@@ -150,9 +180,22 @@ void LetterButton::SetPosition(const Vector2f& position)
 	m_Button.setPosition(position);
 
 	auto bPos(m_Button.getPosition());
+	auto lPos(m_Letter.getPosition());
 	auto bSize(m_Button.getSize());
-	m_Letter.setPosition(bPos.x + bSize.x  * 0.5,
-						 bPos.y + bSize.y  * 0.5);
+
+	auto lBounds = m_Letter.getLocalBounds();
+	//auto glyph = m_Letter.getFont()->getGlyph(m_Letter.getString()[0], m_Letter.getCharacterSize(), false);
+	
+	/*Vector2f letterPos(bPos.x + bSize.x * 0.5 - (lBounds.width + lBounds.left) * 0.5,
+					   bPos.y + bSize.y * 0.5 - (lBounds.height + lBounds.top) * 0.5);*/
+	Vector2f letterPos(bPos.x + bSize.x * 0.5 - (lBounds.width + lBounds.left) * 0.5,
+					   bPos.y + bSize.y * 0.5 - (lBounds.height + lBounds.top) * 0.5 - lBounds.top * 0.5);
+	
+	m_Letter.setPosition(letterPos);
+
+	/*cout << (char)m_Letter.getString()[0] <<" l=" << glyph.bounds.left << " t=" << glyph.bounds.top;
+	cout << " w=" << glyph.bounds.width << " h=" << glyph.bounds.height;
+	cout << " diff-> x=" << glyph.bounds.width - lBounds.width << " y=" << glyph.bounds.height - lBounds.height << endl;*/
 }
 
 }

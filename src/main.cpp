@@ -31,18 +31,18 @@ int main(int argc, char** argv)
 
 	IWordProvider* wordProvider = new StubWordProvider();
 
-	Font f;
+	//Font f;
 	//f.loadFromFile("assets/fonts/Exo-Black.otf");
-	f.loadFromFile("assets/fonts/osaka.unicode.ttf");
+	//f.loadFromFile("assets/fonts/osaka.unicode.ttf");
 
-	Text t(wordProvider->GetCharacterList(), f);
-	t.setColor(Color::Black);
+	//Text t(wordProvider->GetCharacterList(), f);
+	//t.setColor(Color::Black);
 
 	TTexturePtr txPtr = make_shared<Texture>();
 	TFontPtr fPtr = make_shared<Font>();
 
 	txPtr->loadFromFile("assets/images/underline.png");
-	fPtr->loadFromFile("assets/fonts/Exo-Black.otf");
+	fPtr->loadFromFile("assets/fonts/osaka.unicode.ttf");
 
 	bool nextWord = false;
 
@@ -50,9 +50,9 @@ int main(int argc, char** argv)
 	wViewer.SetWord(Word("ABABAB"));
 
 	//LetterPicker picker(Vector2f(40, 40), 6, f);
-	LetterPicker picker(500, 100, 18, fPtr);
+	LetterPicker picker(500, 100, 10, fPtr);
 	picker.SetPosition(Vector2f(0, 400));
-	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお", f);
+	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお");
 	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ");
 	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const wchar_t c)
 	{
