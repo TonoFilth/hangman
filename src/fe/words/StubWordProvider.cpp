@@ -15,12 +15,12 @@ StubWordProvider::StubWordProvider() :
 	TWordVec defVec;
 	TWordVec farmVec;
 
-	defVec.push_back(Word(L"Electronic cigarette",L""));
-	defVec.push_back(Word(L"Computer",L""));
-	defVec.push_back(Word(L"Wallet",L""));
+	defVec.push_back(Word(L"ELECTRONIC CIGARETTE",L""));
+	defVec.push_back(Word(L"COMPUTER",L""));
+	defVec.push_back(Word(L"WALLET",L""));
 
-	farmVec.push_back(Word(L"Hen",L""));
-	farmVec.push_back(Word(L"Pig",L""));
+	farmVec.push_back(Word(L"HEN",L""));
+	farmVec.push_back(Word(L"PIG",L""));
 
 	m_CategoryMap["default"] = defVec;
 	m_CategoryMap["farm"] 	 = farmVec;

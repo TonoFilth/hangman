@@ -11,13 +11,14 @@ namespace fe
 // =============================================================================
 LetterButton::LetterButton(const wchar_t letter, const Font& font,
 	const Vector2f& buttonSize, F32 letterScale) :
-	m_Letter(letter, font)
+	m_Letter(letter, font),
+	m_Callback(nullptr)
 {
 	m_Button.setSize(buttonSize);
 	m_Button.setFillColor(Color::Black);
-	m_Button.setPosition(250, 250);
-	m_Letter.setColor(Color::Red);
-	
+	m_Button.setPosition(0, 0);
+	m_Letter.setColor(Color::White);
+
 	FitLetter(letterScale);
 	TransformableSetOrigin(m_Letter, THAlign::CENTER, TVAlign::CENTER);
 
@@ -50,8 +51,9 @@ LetterButton::~LetterButton()
 // =============================================================================
 void LetterButton::Copy(const LetterButton& toCopy)
 {
-	m_Letter = toCopy.m_Letter;
-	m_Button = toCopy.m_Button;
+	m_Letter   = toCopy.m_Letter;
+	m_Button   = toCopy.m_Button;
+	m_Callback = toCopy.m_Callback;
 }
 
 void LetterButton::FitLetter(const F32 letterScale)
@@ -87,6 +89,23 @@ void LetterButton::FitLetter(const F32 letterScale)
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
+bool LetterButton::HandleInput(const RenderWindow& window)
+{
+	Vector2f mousePos(Mouse::getPosition(window));
+	auto lPos(m_Button.getPosition());
+	auto lBounds(m_Button.getLocalBounds());
+
+	if (m_Callback != nullptr &&
+		mousePos.x >= lPos.x && mousePos.x <= lPos.x + lBounds.width &&
+		mousePos.y >= lPos.y && mousePos.y <= lPos.y + lBounds.height)
+	{
+		m_Callback(this, m_Letter.getString()[0]);
+		return true;
+	}
+
+	return false;
+}
+
 void LetterButton::Draw(RenderWindow& window) const
 {
 	window.draw(m_Button);
@@ -96,6 +115,31 @@ void LetterButton::Draw(RenderWindow& window) const
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
+wchar_t LetterButton::GetLetter() const
+{
+	return m_Letter.getString()[0];
+}
+
+void LetterButton::SetLetter(const wchar_t letter)
+{
+	m_Letter.setString(letter);
+}
+
+void LetterButton::SetLetterColor(const Color& color)
+{
+	m_Letter.setColor(color);
+}
+
+void LetterButton::SetButtonColor(const Color& color)
+{
+	m_Button.setFillColor(color);
+}
+
+void LetterButton::SetCallback(const TLetterCallback& callback)
+{
+	m_Callback = callback;
+}
+
 void LetterButton::SetPosition(const Vector2f& position)
 {
 	m_Button.setPosition(position);

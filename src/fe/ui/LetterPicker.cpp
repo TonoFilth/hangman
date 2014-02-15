@@ -14,11 +14,12 @@ LetterPicker::LetterPicker(const Vector2f& buttonSize, const UI32 cols, const Fo
 	m_Cols(cols),
 	m_ButtonSize(buttonSize),
 	m_PickerSize(0, 0),
-	m_PickerPosition(25, 25),
+	m_PickerPosition(160, 280),
 	m_Font(font),
 	m_Alignment(THAlign::CENTER),
 	m_LineSpacing(0),
-	m_ButtonPadding(0, 0, 0, 0)
+	m_ButtonPadding(0, 0, 0, 0),
+	m_LetterCallback(nullptr)
 {
 	if (m_Cols == 0)
 		m_Cols = 1;
@@ -46,6 +47,13 @@ void LetterPicker::ComputePickerSize()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
+void LetterPicker::HandleInput(const RenderWindow& window)
+{
+	for (auto& button : m_Buttons)
+		if (button.HandleInput(window))
+			return;
+}
+
 void LetterPicker::Draw(RenderWindow& window) const
 {
 	for (auto& button : m_Buttons)
@@ -82,6 +90,7 @@ void LetterPicker::SetLetters(const String& letters, const sf::Font& font)
 		{
 			LetterButton button(letters[curLetter], font, m_ButtonSize, lScale);
 			button.SetPosition(curPos);
+			button.SetCallback(m_LetterCallback);
 
 			m_Buttons.push_back(button);
 
@@ -120,6 +129,20 @@ void LetterPicker::SetLetters(const String& letters, const sf::Font& font)
 	}
 
 	ComputePickerSize();
+}
+
+void LetterPicker::SetLetterColor(const Color& color)
+{
+	for (auto& button : m_Buttons)
+		button.SetLetterColor(color);
+}
+
+void LetterPicker::SetLetterCallback(const TLetterCallback& callback)
+{
+	m_LetterCallback = callback;
+
+	for (auto& button : m_Buttons)
+		button.SetCallback(callback);
 }
 
 }

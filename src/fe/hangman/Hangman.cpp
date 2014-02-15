@@ -61,6 +61,14 @@ void Hangman::SetPosition(const Vector2f& position)
 }
 
 // =============================================================================
+//	QUESTION METHODS
+// =============================================================================
+bool Hangman::IsFullyVisible() const
+{
+	return (m_LastShown + 1 > m_Hangman.size());
+}
+
+// =============================================================================
 //	DEBUG METHODS
 // =============================================================================
 void Hangman::PrintDebug(const std::string& spaces) const

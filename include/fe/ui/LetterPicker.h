@@ -24,6 +24,7 @@ private:
 	UI32 	   	  m_LineSpacing;
 	sf::FloatRect m_ButtonPadding;
 
+	TLetterCallback   m_LetterCallback;
 	TLetterButtonList m_Buttons;
 
 	void ComputePickerSize();
@@ -35,9 +36,12 @@ public:
 	LetterPicker(const sf::Vector2f& buttonSize, const UI32 cols, const sf::Font& font);
 	~LetterPicker();
 
+	void HandleInput(const sf::RenderWindow& window);
 	void Draw(sf::RenderWindow& window) const;
 
 	void SetLetters(const sf::String& letters, const sf::Font& font);
+	void SetLetterColor(const sf::Color& color);
+	void SetLetterCallback(const TLetterCallback& callback);
 };
 
 }

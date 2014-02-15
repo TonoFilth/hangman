@@ -7,6 +7,7 @@
 #include "fe/words/StubWordProvider.h"
 #include "fe/ui/LetterButton.h"
 #include "fe/ui/LetterPicker.h"
+#include "fe/words/WordViewer.h"
 
 using namespace std;
 using namespace sf;
@@ -26,18 +27,52 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	hangman->SetPosition(Vector2f(250, 250));
+	hangman->SetPosition(Vector2f(250, 100));
 
 	IWordProvider* wordProvider = new StubWordProvider();
 
 	Font f;
-	f.loadFromFile("assets/fonts/Exo-Black.otf");
+	//f.loadFromFile("assets/fonts/Exo-Black.otf");
+	f.loadFromFile("assets/fonts/osaka.unicode.ttf");
 
 	Text t(wordProvider->GetCharacterList(), f);
 	t.setColor(Color::Black);
 
-	LetterPicker picker(Vector2f(30, 30), 3, f);
+	TTexturePtr txPtr = make_shared<Texture>();
+	TFontPtr fPtr = make_shared<Font>();
+
+	txPtr->loadFromFile("assets/images/underline.png");
+	fPtr->loadFromFile("assets/fonts/Exo-Black.otf");
+
+	bool nextWord = false;
+
+	WordViewer wViewer(fPtr, txPtr);
+	wViewer.SetWord(Word("ABABAB"));
+
+	LetterPicker picker(Vector2f(40, 40), 6, f);
+	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお", f);
 	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", f);
+	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const wchar_t c)
+	{
+		//cout << String(c).toAnsiString() << endl;
+		//b->SetLetter(L'-');
+
+		// ******* IF PLAYER CLICKS TWO TIMES THE SAME LETTER
+		// ******* COUNTS AS A NEW LETTER CLICK - FIX IT!
+		if (!wViewer.TryLetter(c))
+		{
+			hangman->ShowNextBodyPart();
+			b->SetLetterColor(Color::Red);
+
+			if (hangman->IsFullyVisible())
+				wViewer.RevealWord();
+		}
+		else
+		{
+			b->SetLetterColor(Color::Green);
+		}
+
+	});
 
 	for (auto& category : wordProvider->GetAvaliableCategories())
 		cout << category.toAnsiString() << endl;
@@ -53,16 +88,31 @@ int main(int argc, char** argv)
 				window.close();
 			if (event.type == Event::MouseButtonPressed)
 			{
-				if (!hangman->ShowNextBodyPart())
+				picker.HandleInput(window);
+				
+				//wViewer.TryLetter(L'A');
+				if (nextWord)
+				{
+					wViewer.SetWord(wordProvider->GetNextWord().GetWord());
+					picker.SetLetterColor(Color::White);
 					hangman->HideAllBodyParts();
-				t.setString(wordProvider->GetNextWord().GetWord());
+					nextWord = false;
+				}
+
+				if (wViewer.IsWordVisible() || hangman->IsFullyVisible())
+					nextWord = true;
+
+				//if (!hangman->ShowNextBodyPart())
+				//	hangman->HideAllBodyParts();
+				//t.setString(wordProvider->GetNextWord().GetWord());
 			}
 		}
 
 		window.clear(Color::White);
 		hangman->Draw(window);
-		window.draw(t);
+		//window.draw(t);
 		picker.Draw(window);
+		wViewer.Draw(window);
 		window.display();
 	}
 

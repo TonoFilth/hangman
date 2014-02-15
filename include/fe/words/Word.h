@@ -21,7 +21,7 @@ private:
 
 public:
 	Word();
-	Word(const sf::String& word, const sf::String& hint);
+	Word(const sf::String& word, const sf::String& hint = sf::String(""));
 	Word(const Word& toCopy);
 	Word& operator=(const Word& toCopy);
 	~Word();

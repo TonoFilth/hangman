@@ -28,12 +28,14 @@ private:
 
 public:
 	~Hangman();
-	
+
 	bool ShowNextBodyPart();
 	void HideAllBodyParts();
 	void Draw(sf::RenderWindow& window) const;
 
 	void SetPosition(const sf::Vector2f& position);
+	bool IsFullyVisible() const;
+
 	void PrintDebug(const std::string& spaces = "") const;
 };
 
