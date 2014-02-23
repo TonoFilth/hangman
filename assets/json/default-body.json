@@ -3,13 +3,13 @@
 	"bodypart" :
 	{
 		"order"    : 0,
-		"txCoords" : "0;0;28;28",
+		"txCoords" : "0 0 28 28",
 		"joints"   :
 		{
 			"joint" :
 			{
 				"order"   : 1,
-				"coords"  : "14-28",
+				"coords"  : "14 28",
 				"h-align" : "center",
 				"v-align" : "top"
 			}
@@ -18,34 +18,34 @@
 	"bodypart" :
 	{
 		"order"    : 1,
-		"txCoords" : "0;28;5;50",
+		"txCoords" : "0 28 5 50",
 		"joints"   :
 		{
 			"joint" :
 			{
 				"order"   : 2,
-				"coords"  : "3;14",
+				"coords"  : "3 14",
 				"h-align" : "right",
 				"v-align" : "bottom"
 			},
 			"joint" :
 			{
 				"order"   : 3,
-				"coords"  : "3;14",
+				"coords"  : "3 14",
 				"h-align" : "left",
 				"v-align" : "bottom"
 			},
 			"joint" :
 			{
 				"order"   : 4,
-				"coords"  : "3;48",
+				"coords"  : "3 48",
 				"h-align" : "right",
 				"v-align" : "top"
 			},
 			"joint" :
 			{
 				"order"   : 5,
-				"coords"  : "3;48",
+				"coords"  : "3 48",
 				"h-align" : "left",
 				"v-align" : "top"
 			}
@@ -54,21 +54,21 @@
 	"bodypart" :
 	{
 		"order"    : 2,
-		"txCoords" : "6;28;30;19"
+		"txCoords" : "6 28 30 19"
 	},
 	"bodypart" :
 	{
 		"order"    : 3,
-		"txCoords" : "35;28;30;19"
+		"txCoords" : "35 28 30 19"
 	},
 	"bodypart" :
 	{
 		"order"    : 4,
-		"txCoords" : "6;47;30;19"
+		"txCoords" : "6 47 30 19"
 	},
 	"bodypart" :
 	{
 		"order"    : 5,
-		"txCoords" : "35;47;30;19"
+		"txCoords" : "35 47 30 19"
 	}
 }

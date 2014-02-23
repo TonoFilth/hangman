@@ -6,9 +6,7 @@
 #include <functional>
 #include <SFML/Graphics.hpp>
 
-#include "fe/types/BasicTypes.h"
-#include "fe/types/Alignment.h"
-#include "fe/utils/TransformableUtils.h"
+#include "fe/types/UITypes.h"
 
 namespace fe
 {
@@ -21,12 +19,12 @@ typedef std::function<void(LetterButton* sender, const wchar_t)> TLetterCallback
 class LetterButton
 {
 private:
-	sf::Text 		   m_Letter;
-	sf::RectangleShape m_Button;
+	sf::Text 		   m_Label;
+	sf::RectangleShape m_Background;
 	TLetterCallback    m_Callback;
 
 	void Copy(const LetterButton& toCopy);
-	void FitLetter(const F32 letterScale);
+	void FitLabel(F32 lineHeight);
 
 public:
 	LetterButton(const wchar_t letter, const sf::Font& font,

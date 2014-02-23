@@ -75,4 +75,28 @@ void TransformableAlignRelative(Transformable& toAlign, const RectangleShape& re
 	toAlign.setPosition(aPos);
 }
 
+sf::Vector2f TransformableGetPositionAligned(const sf::Vector2f& desiredPosition,
+	const sf::Vector2f& objectSize, const TAlignment& alignment)
+{
+	Vector2f finalPos(desiredPosition);
+
+	switch (alignment.h)
+	{
+		case THAlign::LEFT   : break;
+		case THAlign::CENTER : finalPos.x -= objectSize.x * 0.5; break;
+		case THAlign::RIGHT  : finalPos.x -= objectSize.x; break;
+		default : cerr << "ERROR: Bad horizontal alignment" << endl; break;
+	}
+
+	switch (alignment.v)
+	{
+		case TVAlign::TOP    : break;
+		case TVAlign::CENTER : finalPos.y -= objectSize.y * 0.5; break;
+		case TVAlign::BOTTOM : finalPos.y -= objectSize.y; break;
+		default : cerr << "ERROR: Bad vertical alignment" << endl; break;
+	}
+
+	return finalPos;
+}
+
 }

@@ -14,17 +14,18 @@ namespace fe
 class HangmanFactory
 {
 private:
-	IBodyBuilder* 		m_BodyBuilder;
-	IBodyPartExtractor* m_BodyPartExtractor;
+	TBodyBuilderPtr 	  m_BodyBuilder;
+	TBodyPartExtractorPtr m_BodyPartExtractor;
 
 	HangmanFactory(const HangmanFactory& toCopy);
 	HangmanFactory& operator=(const HangmanFactory& toCopy);
 
 public:
-	HangmanFactory(IBodyPartExtractor* bpExtractor, IBodyBuilder* bodyBuilder);
+	HangmanFactory(const TBodyPartExtractorPtr& bpExtractor,
+				   const TBodyBuilderPtr& 	    bodyBuilder);
 	~HangmanFactory();
 
-	THangmanShPtr CreateFromFile(const std::string& fileName);
+	THangmanShPtr Create();
 };
 
 }

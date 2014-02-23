@@ -9,6 +9,8 @@ namespace fe
 
 class Word;
 
+extern const Word InvalidWord;
+
 typedef std::vector<Word> TWordVec;
 
 class Word
@@ -30,6 +32,8 @@ public:
 	const sf::String& GetHint() const;
 	void SetWord(const sf::String& word);
 	void SetHint(const sf::String& hint);
+
+	bool IsValid() const;
 };
 
 }

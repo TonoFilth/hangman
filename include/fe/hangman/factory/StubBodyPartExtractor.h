@@ -16,8 +16,7 @@ public:
 	StubBodyPartExtractor();
 	~StubBodyPartExtractor();
 
-	virtual bool Extract(const std::string& fileName, std::string& txFileNameOut,
-		TBodyPartVec& bodyPartsOut);
+	virtual bool Extract(std::string& txFileNameOut, TBodyPartVec& bodyPartsOut);
 };
 
 }

@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "fe/types/BasicTypes.h"
-#include "fe/types/Alignment.h"
+#include "fe/types/AlignmentTypes.h"
 
 namespace fe
 {

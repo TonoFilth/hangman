@@ -6,6 +6,11 @@ namespace fe
 {
 
 // =============================================================================
+//	CONSTANTS
+// =============================================================================
+const Word InvalidWord("ERROR", "ERROR");
+
+// =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
 Word::Word() :
@@ -70,6 +75,14 @@ void Word::SetWord(const String& word)
 void Word::SetHint(const String& hint)
 {
 	m_Hint = hint;
+}
+
+// =============================================================================
+//	QUESTION METHODS
+// =============================================================================
+bool Word::IsValid() const
+{
+	return (m_Word == InvalidWord.m_Word && m_Hint == InvalidWord.m_Hint);
 }
 
 }

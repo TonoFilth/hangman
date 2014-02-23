@@ -20,8 +20,8 @@ enum class TVAlign
 
 struct Alignment
 {
-	Alignment(const THAlign a, const TVAlign b) :
-		h(a), v(b) {}
+	Alignment() : h(THAlign::LEFT), v(TVAlign::TOP) {}
+	Alignment(const THAlign a, const TVAlign b) : h(a), v(b) {}
 	
 	THAlign h;
 	TVAlign v;

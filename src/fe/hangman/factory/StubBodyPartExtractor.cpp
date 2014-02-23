@@ -20,8 +20,7 @@ StubBodyPartExtractor::~StubBodyPartExtractor()
 // =============================================================================
 //	VIRTUAL METHODS
 // =============================================================================
-bool StubBodyPartExtractor::Extract(const string& fileName, string& txFileNameOut,
-		TBodyPartVec& bodyPartsOut)
+bool StubBodyPartExtractor::Extract(string& txFileNameOut, TBodyPartVec& bodyPartsOut)
 {
 	BodyPart head(0, IntRect(0, 0, 28, 28));
 	BodyPart body(1, IntRect(0, 28, 5, 50));

@@ -2,10 +2,16 @@
 #define __BODY_PART_EXTRACTOR_H__
 
 #include <string>
+#include <memory>
+
 #include "fe/hangman/BodyPart.h"
 
 namespace fe
 {
+
+class IBodyPartExtractor;
+
+typedef std::shared_ptr<IBodyPartExtractor> TBodyPartExtractorPtr;
 
 class IBodyPartExtractor
 {
@@ -17,8 +23,7 @@ public:
 	IBodyPartExtractor() 		  {}
 	virtual ~IBodyPartExtractor() {}
 
-	virtual bool Extract(const std::string& fileName, std::string& txFileNameOut,
-		TBodyPartVec& bodyPartsOut) = 0;
+	virtual bool Extract(std::string& txFileNameOut, TBodyPartVec& bodyPartsOut) = 0;
 };
 
 }

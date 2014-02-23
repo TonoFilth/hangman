@@ -9,7 +9,8 @@ namespace fe
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-HangmanFactory::HangmanFactory(IBodyPartExtractor* bpExtractor, IBodyBuilder* bodyBuilder) :
+HangmanFactory::HangmanFactory(const TBodyPartExtractorPtr& bpExtractor,
+							   const TBodyBuilderPtr& bodyBuilder) :
 	m_BodyBuilder(bodyBuilder),
 	m_BodyPartExtractor(bpExtractor)
 {
@@ -19,14 +20,12 @@ HangmanFactory::HangmanFactory(IBodyPartExtractor* bpExtractor, IBodyBuilder* bo
 
 HangmanFactory::~HangmanFactory()
 {
-	m_BodyBuilder 		= nullptr;
-	m_BodyPartExtractor = nullptr;
 }
 
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-THangmanShPtr HangmanFactory::CreateFromFile(const std::string& fileName)
+THangmanShPtr HangmanFactory::Create()
 {
 	string 		 txFileName;
 	TBodyPartVec bodyParts;
@@ -34,9 +33,9 @@ THangmanShPtr HangmanFactory::CreateFromFile(const std::string& fileName)
 	THangmanShPtr hangman(new Hangman());
 
 	// Extract body parts
-	if (!m_BodyPartExtractor->Extract(fileName, txFileName, bodyParts))
+	if (!m_BodyPartExtractor->Extract(txFileName, bodyParts))
 	{
-		cerr << "Can't extract body parts from: " << fileName << endl;
+		cerr << "Can't extract body parts" << endl;
 		return nullptr;
 	}
 

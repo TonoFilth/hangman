@@ -1,12 +1,16 @@
 #ifndef __IBODY_BUILDER_H__
 #define __IBODY_BUILDER_H__
 
+#include <memory>
 #include "fe/hangman/BodyPart.h"
 
 namespace fe
 {
 
-typedef std::vector<sf::Sprite> TSpriteVec;
+class IBodyBuilder;
+
+typedef std::vector<sf::Sprite> 	  TSpriteVec;
+typedef std::shared_ptr<IBodyBuilder> TBodyBuilderPtr;
 
 class IBodyBuilder
 {

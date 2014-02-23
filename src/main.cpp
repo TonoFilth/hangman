@@ -3,11 +3,14 @@
 #include "fe/hangman/factory/HangmanFactory.h"
 #include "fe/hangman/factory/OrderedBodyBuilder.h"
 #include "fe/hangman/factory/StubBodyPartExtractor.h"
+#include "fe/hangman/factory/JsonBodyPartExtractor.h"
 #include "fe/words/Word.h"
-#include "fe/words/StubWordProvider.h"
 #include "fe/ui/LetterButton.h"
 #include "fe/ui/LetterPicker.h"
 #include "fe/ui/WordViewer.h"
+#include "fe/types/UITypes.h"
+#include "fe/words/Dictionary.h"
+#include "fe/words/RandomDictionary.h"
 
 using namespace std;
 using namespace sf;
@@ -15,50 +18,48 @@ using namespace fe;
 
 int main(int argc, char** argv)
 {
-	IBodyBuilder* bBuilder 			= new OrderedBodyBuilder();
-	IBodyPartExtractor* bpExtractor = new StubBodyPartExtractor();
+	TBodyBuilderPtr       bBuilder    = make_shared<OrderedBodyBuilder>();
+	TBodyPartExtractorPtr bpExtractor = make_shared<JsonBodyPartExtractor>("assets/json/default-body.json");
 
 	THangmanShPtr hangman;
 	HangmanFactory factory(bpExtractor, bBuilder);
 
-	if ((hangman = factory.CreateFromFile("myfile.txt")) == nullptr)
+	if ((hangman = factory.Create()) == nullptr)
 	{
-		cerr << "Exiting ..." << endl;
+		cerr << "Can't build hangman. Terminating ..." << endl;
 		return 1;
 	}
 
 	hangman->SetPosition(Vector2f(250, 100));
 
-	IWordProvider* wordProvider = new StubWordProvider();
+	Texture guidesTexture;
+	guidesTexture.loadFromFile("assets/images/guides.png");
+	Sprite guides(guidesTexture);
+	guides.setPosition(0, 0);
 
-	//Font f;
-	//f.loadFromFile("assets/fonts/Exo-Black.otf");
-	//f.loadFromFile("assets/fonts/osaka.unicode.ttf");
+	TTexturePtr txUnderline = make_shared<Texture>();
+	TFontPtr exoFont = make_shared<Font>(), osakaFont = make_shared<Font>();
 
-	//Text t(wordProvider->GetCharacterList(), f);
-	//t.setColor(Color::Black);
+	txUnderline->loadFromFile("assets/images/underline.png");
+	exoFont->loadFromFile("assets/fonts/Exo-Black.otf");
+	osakaFont->loadFromFile("assets/fonts/osaka.unicode.ttf");
 
-	TTexturePtr txPtr = make_shared<Texture>();
-	TFontPtr fPtr = make_shared<Font>();
-
-	txPtr->loadFromFile("assets/images/underline.png");
-	fPtr->loadFromFile("assets/fonts/osaka.unicode.ttf");
+	TDictionaryPtr dictionary = make_shared<RandomDictionary>(L"ABCDEFG", "assets/fonts/Exo-Black.otf");
+	dictionary->AddCategory("animals");
+	dictionary->AddWord(Word(L"DOG"), "animals");
+	dictionary->AddWord(Word(L"CAT"), "animals");
 
 	bool nextWord = false;
 
-	WordViewer wViewer(500, 50, fPtr, txPtr);
+	WordViewer wViewer(500, 50, exoFont, txUnderline);
 	wViewer.SetWord(Word("ABABAB"));
 
-	//LetterPicker picker(Vector2f(40, 40), 6, f);
-	LetterPicker picker(500, 100, 10, fPtr);
+	LetterPicker picker(500, 100, 10, exoFont);
 	picker.SetPosition(Vector2f(0, 400));
 	//picker.SetLetters(L"んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお");
 	picker.SetLetters(L"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ");
 	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const wchar_t c)
 	{
-		//cout << String(c).toAnsiString() << endl;
-		//b->SetLetter(L'-');
-
 		// ******* IF PLAYER CLICKS TWO TIMES THE SAME LETTER
 		// ******* COUNTS AS A NEW LETTER CLICK - FIX IT!
 		if (!wViewer.TryLetter(c))
@@ -76,9 +77,6 @@ int main(int argc, char** argv)
 
 	});
 
-	for (auto& category : wordProvider->GetAvaliableCategories())
-		cout << category.toAnsiString() << endl;
-
 	RenderWindow window(VideoMode(500, 500), "Hangman");
 
 	while (window.isOpen())
@@ -92,10 +90,9 @@ int main(int argc, char** argv)
 			{
 				picker.HandleInput(window);
 				
-				//wViewer.TryLetter(L'A');
 				if (nextWord)
 				{
-					wViewer.SetWord(wordProvider->GetNextWord().GetWord());
+					wViewer.SetWord(dictionary->GetWord("animals").GetWord());
 					picker.SetLetterColor(Color::White);
 					hangman->HideAllBodyParts();
 					nextWord = false;
@@ -103,24 +100,16 @@ int main(int argc, char** argv)
 
 				if (wViewer.IsWordVisible() || hangman->IsFullyVisible())
 					nextWord = true;
-
-				//if (!hangman->ShowNextBodyPart())
-				//	hangman->HideAllBodyParts();
-				//t.setString(wordProvider->GetNextWord().GetWord());
 			}
 		}
 
 		window.clear(Color::White);
 		hangman->Draw(window);
-		//window.draw(t);
 		picker.Draw(window);
 		wViewer.Draw(window);
+		window.draw(guides);
 		window.display();
 	}
-
-	delete wordProvider;
-	delete bBuilder;
-	delete bpExtractor;
 
 	return 0;
 }
