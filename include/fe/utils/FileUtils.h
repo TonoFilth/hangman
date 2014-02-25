@@ -25,6 +25,8 @@ public:
     static bool ReadFirstLine(const std::string& readFrom, std::string& writeTo);
     static bool ReadLines(const std::string& readFrom, std::list<std::string>& writeTo);
     static bool ReadLines(const std::string& readFrom, std::string& writeTo);
+    static bool ReadLines(const std::string& readFrom, std::list<std::wstring>& writeTo);
+    static bool ReadLines(const std::string& readFrom, std::wstring& writeTo);
     static bool WriteLines(const std::string& writeTo, const std::list<std::string>& readFrom);
     static bool WriteLines(const std::string& writeTo, const std::list<std::list<std::string> >& readFrom);
 };

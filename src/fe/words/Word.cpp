@@ -1,5 +1,6 @@
 #include "fe/words/Word.h"
 
+using namespace std;
 using namespace sf;
 
 namespace fe
@@ -11,15 +12,28 @@ namespace fe
 const Word InvalidWord("ERROR", "ERROR");
 
 // =============================================================================
+//	NON-MEMBER FUNCTIONS
+// =============================================================================
+bool operator==(const Word& wordA, const Word& wordB)
+{
+	return (wordA.m_Word == wordB.m_Word && wordA.m_Hint == wordB.m_Hint);
+}
+
+bool operator!=(const Word& wordA, const Word& wordB)
+{
+	return (wordA.m_Word != wordB.m_Word || wordA.m_Hint != wordB.m_Hint);
+}
+
+// =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
 Word::Word() :
-	m_Word(""),
-	m_Hint("")
+	m_Word(u8""),
+	m_Hint(u8"")
 {
 }
 
-Word::Word(const String& word, const String& hint) :
+Word::Word(const string& word, const string& hint) :
 	m_Word(word),
 	m_Hint(hint)
 {
@@ -57,22 +71,22 @@ void Word::Copy(const Word& toCopy)
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-const String& Word::GetWord() const
+const string& Word::GetWord() const
 {
 	return m_Word;
 }
 
-const String& Word::GetHint() const
+const string& Word::GetHint() const
 {
 	return m_Hint;
 }
 
-void Word::SetWord(const String& word)
+void Word::SetWord(const string& word)
 {
 	m_Word = word;
 }
 
-void Word::SetHint(const String& hint)
+void Word::SetHint(const string& hint)
 {
 	m_Hint = hint;
 }

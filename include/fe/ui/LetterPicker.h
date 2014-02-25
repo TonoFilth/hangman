@@ -6,6 +6,7 @@
 
 #include "fe/ui/LetterButton.h"
 #include "fe/types/PointerTypes.h"
+#include "fe/utils/StringUtils.h"
 
 namespace fe
 {
@@ -41,7 +42,7 @@ public:
 	void HandleInput(const sf::RenderWindow& window);
 	void Draw(sf::RenderWindow& window) const;
 
-	void SetLetters(const sf::String& letters);
+	void SetLetters(const std::string& letters);
 	void SetLetterColor(const sf::Color& color);
 	void SetLetterCallback(const TLetterCallback& callback);
 	void SetPosition(const sf::Vector2f& position);

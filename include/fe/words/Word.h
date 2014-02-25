@@ -16,25 +16,31 @@ typedef std::vector<Word> TWordVec;
 class Word
 {
 private:
-	sf::String m_Word;
-	sf::String m_Hint;
+	std::string m_Word;
+	std::string m_Hint;
 
 	void Copy(const Word& toCopy);
 
 public:
 	Word();
-	Word(const sf::String& word, const sf::String& hint = sf::String(""));
+	Word(const std::string& word, const std::string& hint = std::string(u8""));
 	Word(const Word& toCopy);
 	Word& operator=(const Word& toCopy);
 	~Word();
 
-	const sf::String& GetWord() const;
-	const sf::String& GetHint() const;
-	void SetWord(const sf::String& word);
-	void SetHint(const sf::String& hint);
+	friend bool operator==(const Word& wordA, const Word& wordB);
+	friend bool operator!=(const Word& wordA, const Word& wordB);
+
+	const std::string& GetWord() const;
+	const std::string& GetHint() const;
+	void SetWord(const std::string& word);
+	void SetHint(const std::string& hint);
 
 	bool IsValid() const;
 };
+
+bool operator==(const Word& wordA, const Word& wordB);
+bool operator!=(const Word& wordA, const Word& wordB);
 
 }
 

@@ -34,9 +34,8 @@ void WordViewer::GenerateLetters()
 {
 	m_UnderlineSprites.clear();
 
-	auto letterCount = m_Word.GetWord().getSize();
+	auto letterCount = StringUtils::U8Length(m_Word.GetWord());
 	auto txSize = m_UnderlineTexture->getSize();
-	auto word = m_Word.GetWord();
 
 	Vector2f drawableArea(
 		m_Size.x - (m_LetterPadding.left + m_LetterPadding.width) * letterCount,
@@ -48,16 +47,19 @@ void WordViewer::GenerateLetters()
 	Vector2f curPos(m_LetterPadding.left + m_Position.x,
 					m_LetterPadding.top  + m_Position.y);
 
+	// Get the UTF-8 individual codepoints to iterate over them
+	auto utf8letters = StringUtils::U8Split(m_Word.GetWord());
+
 	for (UI32 i = 0; i < letterCount; ++i)
 	{
-		if (word[i] == L' ')
+		if (utf8letters[i] == " ")
 		{
 			curPos.x += m_LetterSize.x + m_LetterPadding.left + m_LetterPadding.width;
 			continue;
 		}
 
 		Sprite undSprite(*m_UnderlineTexture);
-		LetterButton letter(word[i], *m_LetterFont, m_LetterSize);
+		LetterButton letter(utf8letters[i], m_LetterFont, m_LetterSize);
 
 		letter.SetPosition(curPos);
 		letter.SetLetterColor(Color::Black);
@@ -85,7 +87,7 @@ void WordViewer::GenerateLetters()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-bool WordViewer::TryLetter(const wchar_t letter)
+bool WordViewer::TryLetter(const std::string& letter)
 {
 	list<TLetterButtonList::iterator> toErase;
 

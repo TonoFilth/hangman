@@ -10,27 +10,38 @@
 namespace fe
 {
 
-typedef std::vector<UI32> 					 TRandomIndexVec;
-typedef std::map<TCategory, TRandomIndexVec> TRandomIndexMap;
+typedef std::vector<UI32> 					   TRandomIndexVec;
+typedef std::map<TCategoryID, TRandomIndexVec> TRandomIndexMap;
 
 class RandomDictionary : public Dictionary
 {
 private:
 	TRandomIndexMap m_IndexMap;
+	TRandomIndexVec m_RandomCategoryVec;
 
-	void ShuffleAll();
-	void ShuffleCategory(const TCategory& category);
+	bool ShuffleAll();
+	bool ShuffleCategory(const TCategoryID categoryID);
+	bool ShuffleRandomCategoryVector();
+
+	Word GetWordFromAnyCategory();
 
 	RandomDictionary(const RandomDictionary& toCopy);
 	RandomDictionary& operator=(const RandomDictionary& toCopy);
 
 public:
-	RandomDictionary(const sf::String& characterSet, const std::string& fontFile,
-		const TCategoryList& categoryList = TCategoryList());
+	RandomDictionary(const std::string& name,
+			   		 const std::string& lang,
+			   		 const std::string& characterSet,
+			   		 const std::string& fontFile,
+			   		 const TCategoryList& categoryList = TCategoryList());
 	virtual ~RandomDictionary();
 
-	virtual Word GetWord(const TCategory& category = DEF_CATEGORY, const UI32 index = 0);
-	virtual void AddWord(const Word& word, const TCategory& category = DEF_CATEGORY);
+	virtual Word GetWord(const TCategoryID categoryID = AnyCategory.id,
+						 const UI32 index = 0);
+	virtual bool AddWord(const Word& word,
+						 const TCategoryID categoryID = AnyCategory.id);
+	virtual bool RemoveWord(const Word& word);
+	virtual bool RemoveCategory(const TCategoryID categoryID);
 };
 
 }

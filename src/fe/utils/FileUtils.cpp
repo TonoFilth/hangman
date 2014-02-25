@@ -93,6 +93,67 @@ bool FileUtils::ReadLines(const string& readFrom, string& writeTo)
 	return true;
 }
 
+bool FileUtils::ReadLines(const string& readFrom, list<wstring>& writeTo)
+{
+	wifstream file;
+	wstring   readLine;
+
+	file.open(readFrom.c_str());
+
+	if (!file)
+	{
+		cerr << "ERROR: No se pudo abrir el fichero: " << readFrom << endl;
+		return false;
+	}
+
+	while (!file.eof())
+	{
+		readLine = L"";
+		file >> readLine;
+
+		// Ignorar lineas en blanco
+		if (readLine == L"")
+			continue;
+
+		writeTo.push_back(readLine);
+	}
+
+	file.close();
+
+	return true;
+}
+   
+bool FileUtils::ReadLines(const std::string& readFrom, std::wstring& writeTo)
+{
+	wifstream file;
+	wstring   readLine;
+	writeTo = L"";
+
+	file.open(readFrom.c_str());
+
+	if (!file)
+	{
+		cerr << "ERROR: No se pudo abrir el fichero: " << readFrom << endl;
+		return false;
+	}
+
+	while (!file.eof())
+	{
+		readLine = L"";
+		file >> readLine;
+
+		// Ignorar lineas en blanco
+		if (readLine == L"")
+			continue;
+
+		writeTo += readLine;
+	}
+
+	file.close();
+
+	return true;
+}
+
 bool FileUtils::WriteLines(const string& writeTo, const list<string>& readFrom)
 {
 	ofstream writeFile;

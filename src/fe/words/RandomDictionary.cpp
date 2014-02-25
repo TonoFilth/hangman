@@ -1,14 +1,20 @@
 #include "fe/words/RandomDictionary.h"
 
+using namespace std;
+using namespace sf;
+
 namespace fe
 {
 
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-RandomDictionary::RandomDictionary(const sf::String& characterSet, const std::string& fontFile,
-	const TCategoryList& categoryList) :
-	Dictionary(characterSet, fontFile, categoryList)
+RandomDictionary::RandomDictionary(const string& name,
+					   			   const string& lang,
+					   			   const string& characterSet,
+					   			   const string& fontFile,
+					   			   const TCategoryList& categoryList) :
+	Dictionary(name, lang, characterSet, fontFile, categoryList)
 {
 	srand(time(0));
 }
@@ -20,48 +26,107 @@ RandomDictionary::~RandomDictionary()
 // =============================================================================
 //	PRIVATE AND PROTECTED METHODS
 // =============================================================================
-void RandomDictionary::ShuffleAll()
+bool RandomDictionary::ShuffleAll()
 {
+	bool allOK = true;
+
 	for (auto& kv : m_IndexMap)
-		ShuffleCategory(kv.first);
+		if (!ShuffleCategory(kv.first))
+			allOK = false;
+
+	return allOK;
 }
 
-void RandomDictionary::ShuffleCategory(const TCategory& category)
+bool RandomDictionary::ShuffleCategory(const TCategoryID categoryID)
 {
-	auto wc = GetWordCountByCategory(category);
+	auto wc = GetWordCountByCategory(categoryID);
 	
 	if (wc == 0)
-		return;
+		return false;
 	
-	m_IndexMap[category].clear();
+	m_IndexMap[categoryID].clear();
 
 	for (UI32 i = 0; i < wc; ++i)
-		m_IndexMap[category].push_back(i);
+		m_IndexMap[categoryID].push_back(i);
 
-	random_shuffle(m_IndexMap[category].begin(), m_IndexMap[category].end());
+	random_shuffle(m_IndexMap[categoryID].begin(), m_IndexMap[categoryID].end());
+
+	return true;
+}
+
+bool RandomDictionary::ShuffleRandomCategoryVector()
+{
+	auto cc = GetCategoryCount();
+
+	if (cc == 0)
+		return false;
+
+	m_RandomCategoryVec.clear();
+
+	for (auto& kv : m_IndexMap)
+		m_RandomCategoryVec.push_back(kv.first);
+
+	random_shuffle(m_RandomCategoryVec.begin(), m_RandomCategoryVec.end());	
+
+	return true;
+}
+
+Word RandomDictionary::GetWordFromAnyCategory()
+{
+	if (m_RandomCategoryVec.empty() && !ShuffleRandomCategoryVector())
+		return InvalidWord;
+
+	UI32 categoryID = m_RandomCategoryVec.front();
+
+	if (m_IndexMap[categoryID].empty() && !ShuffleCategory(categoryID))
+		return InvalidWord;
+
+	UI32 idx = m_IndexMap[categoryID].front();
+	m_RandomCategoryVec.erase(m_RandomCategoryVec.begin());
+	m_IndexMap[categoryID].erase(m_IndexMap[categoryID].begin());
+
+	return Dictionary::GetWord(categoryID, idx);
 }
 
 // =============================================================================
 //	VIRTUAL METHODS
 // =============================================================================
-Word RandomDictionary::GetWord(const TCategory& category, const UI32 index)
+Word RandomDictionary::GetWord(const TCategoryID categoryID, const UI32 index)
 {
-	if (m_IndexMap.count(category) == 0 || m_IndexMap[category].empty())
+	if (categoryID == AnyCategory.id)
+		return GetWordFromAnyCategory();
+
+	if (m_IndexMap.count(categoryID) == 0)
 		return InvalidWord;
 
-	UI32 idx = m_IndexMap[category].front();
-	m_IndexMap.erase(m_IndexMap.begin());
+	if (m_IndexMap[categoryID].empty() && !ShuffleCategory(categoryID))
+		return InvalidWord;
 
-	return Dictionary::GetWord(category, idx);
+	UI32 idx = m_IndexMap[categoryID].front();
+	m_IndexMap[categoryID].erase(m_IndexMap[categoryID].begin());
+
+	return Dictionary::GetWord(categoryID, idx);
 }
 
-void RandomDictionary::AddWord(const Word& word, const TCategory& category)
+bool RandomDictionary::AddWord(const Word& word, const TCategoryID categoryID)
 {
-	if (m_IndexMap.count(category) == 0)
-		m_IndexMap[category] = TRandomIndexVec();
+	if (!ContainsCategory(categoryID))
+		return false;
 
-	ShuffleCategory(category);
-	Dictionary::AddWord(word, category);
+	if (m_IndexMap.count(categoryID) == 0)
+		m_IndexMap[categoryID] = TRandomIndexVec();
+
+	return Dictionary::AddWord(word, categoryID) && ShuffleCategory(categoryID);
+}
+
+bool RandomDictionary::RemoveWord(const Word& word)
+{
+	return Dictionary::RemoveWord(word) && ShuffleAll();
+}
+
+bool RandomDictionary::RemoveCategory(const TCategoryID categoryID)
+{
+	return (Dictionary::RemoveCategory(categoryID) && m_IndexMap.erase(categoryID) == 1);
 }
 
 }

@@ -9,15 +9,25 @@ namespace fe
 // =============================================================================
 //	CONSTANTS
 // =============================================================================
-const string DEF_CATEGORY = "default";
+const TDictionaryID INVALID_DICTIONARY_ID = 0;
+const TCategoryID INVALID_CATEGORY_ID = 0;
+
+const Category AnyCategory(666, "any");
+const Category InvalidCategory(INVALID_CATEGORY_ID, "INVALID");
 
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-Dictionary::Dictionary(const String& characterSet, const string& fontFile,
-	const TCategoryList& categoryList) :
+Dictionary::Dictionary(const string& name,
+					   const string& lang,
+					   const string& characterSet,
+					   const string& fontFile,
+					   const TCategoryList& categoryList) :
+		m_Name(name),
+		m_Lang(lang),
 		m_CharacterSet(characterSet),
-		m_Font(make_shared<Font>())
+		m_Font(make_shared<Font>()),
+		m_CategoryID(0)
 {
 	if (!m_Font->loadFromFile(fontFile))
 	{
@@ -25,10 +35,8 @@ Dictionary::Dictionary(const String& characterSet, const string& fontFile,
 		throw;
 	}
 
-	m_WordMap["default"] = TWordVec();
-
 	for (auto& category : categoryList)
-		m_WordMap[category] = TWordVec();
+		m_WordMap[category.id] = TWordVec();
 }
 
 Dictionary::~Dictionary()
@@ -38,46 +46,103 @@ Dictionary::~Dictionary()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-void Dictionary::AddWord(const Word& word, const TCategory& category)
+bool Dictionary::AddWord(const Word& word, const TCategoryID categoryID)
 {
-	if (m_WordMap.count(category) == 0)
+	if (m_WordMap.count(categoryID) == 0)
 	{
-		cerr << "Category " << category.toAnsiString() << " doesn't exists" << endl;
-		return;
+		cerr << "Category " << categoryID << " doesn't exists" << endl;
+		return false;
 	}
 
-	m_WordMap[category].push_back(word);
+	m_WordMap[categoryID].push_back(word);
+
+	return true;
 }
 
-void Dictionary::AddCategory(const TCategory& category)
+TCategoryID Dictionary::AddCategory(const string& categoryName)
 {
-	if (m_WordMap.count(category) == 1)
+	for (auto& category : m_Categories)
 	{
-		cerr << "Category " << category.toAnsiString() << " already exists" << endl;
-		return;
+		if (category.name == categoryName)
+		{
+			cerr << "Category " << categoryName << " already exists" << endl;
+			return 0;
+		}
 	}
 
-	m_WordMap[category] = TWordVec();
+	TCategory category(m_CategoryID, categoryName);
+	m_Categories.push_back(category);
+	m_CategoryID++;
+	m_WordMap[category.id] = TWordVec();
+
+	return category.id;
+}
+
+bool Dictionary::AddCategory(const TCategory& category)
+{
+	if (m_WordMap.count(category.id) == 1)
+	{
+		cerr << "Category with id " << category.id << " already exists" << endl;
+		return false;
+	}
+
+	m_WordMap[category.id] = TWordVec();
+	return true;
+}
+
+bool Dictionary::RemoveWord(const Word& word)
+{
+	bool erased = false;
+
+	for (auto& kv : m_WordMap)
+	{
+		for (auto it = kv.second.begin(); it != kv.second.end(); ++it)
+		{
+			if (*it == word)
+			{
+				kv.second.erase(it);
+				erased = true;
+				break;
+			}
+		}
+	}
+
+	return erased;
+}
+
+bool Dictionary::RemoveCategory(const TCategoryID categoryID)
+{
+	return m_WordMap.erase(categoryID) == 1;
 }
 
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-Word Dictionary::GetWord(const TCategory& category, const UI32 index)
+string Dictionary::GetName() const
 {
-	if (m_WordMap.count(category) == 0)
+	return m_Name;
+}
+
+string Dictionary::GetLanguage() const
+{
+	return m_Lang;
+}
+
+Word Dictionary::GetWord(const TCategoryID categoryID, const UI32 index)
+{
+	if (m_WordMap.count(categoryID) == 0)
 	{
-		cerr << "Category " << category.toAnsiString() << " doesn't exists" << endl;
+		cerr << "Category " << categoryID << " doesn't exists" << endl;
 		return Word();
 	}
 
-	if (m_WordMap[category].size() <= index)
+	if (m_WordMap[categoryID].size() <= index)
 	{
 		cerr << "Index out of range: " << index << endl;
 		return Word();
 	}
 
-	return m_WordMap[category][index];
+	return m_WordMap[categoryID][index];
 }
 
 UI32 Dictionary::GetWordCount() const
@@ -90,30 +155,30 @@ UI32 Dictionary::GetWordCount() const
 	return wc;
 }
 
-UI32 Dictionary::GetWordCountByCategory(const TCategory& category) const
+UI32 Dictionary::GetWordCountByCategory(const TCategoryID categoryID) const
 {
-	if (m_WordMap.count(category) == 0)
+	if (m_WordMap.count(categoryID) == 0)
 	{
-		cerr << "Category " << category.toAnsiString() << " doesn't exists" << endl;
+		cerr << "Category " << categoryID << " doesn't exists" << endl;
 		return 0;
 	}
 
-	return m_WordMap.find(category)->second.size();
+	return m_WordMap.find(categoryID)->second.size();
 }
 
-String Dictionary::GetCharacterSet() const
+UI32 Dictionary::GetCategoryCount() const
 {
-	return m_CharacterSet;
+	return m_Categories.size();
 }
 
 TCategoryList Dictionary::GetCategoryList() const
 {
-	TCategoryList cl;
+	return m_Categories;
+}
 
-	for (auto& kv : m_WordMap)
-		cl.push_back(kv.first);
-
-	return cl;
+string Dictionary::GetCharacterSet() const
+{
+	return m_CharacterSet;
 }
 
 TFontPtr Dictionary::GetFont() const
@@ -129,9 +194,9 @@ bool Dictionary::IsEmpty() const
 	return m_WordMap.empty();
 }
 
-bool Dictionary::ContainsCategory(const TCategory& category) const
+bool Dictionary::ContainsCategory(const TCategoryID categoryID) const
 {
-	return m_WordMap.count(category) == 1;
+	return m_WordMap.count(categoryID) == 1;
 }
 
 }

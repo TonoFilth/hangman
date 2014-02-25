@@ -9,13 +9,14 @@
 #include "fe/ui/LetterButton.h"
 #include "fe/types/SpriteTypes.h"
 #include "fe/types/PointerTypes.h"
+#include "fe/utils/StringUtils.h"
 
 namespace fe
 {
 
 class WordViewer;
 
-typedef std::function<void(WordViewer* sender, const wchar_t letter)> TTryLetterCallback;
+typedef std::function<void(WordViewer*, const std::string&)> TTryLetterCallback;
 
 class WordViewer
 {
@@ -43,10 +44,10 @@ private:
 
 public:
 	WordViewer(const UI32 width, const UI32 height, const TFontPtr& font,
-		const TTexturePtr& lUndTexture);
+			   const TTexturePtr& lUndTexture);
 	~WordViewer();
 
-	bool TryLetter(const wchar_t letter);
+	bool TryLetter(const std::string& letter);
 	void HideWord();
 	void RevealWord();
 	void Draw(sf::RenderWindow& window) const;

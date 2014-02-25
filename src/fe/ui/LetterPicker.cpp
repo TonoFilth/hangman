@@ -55,7 +55,7 @@ void LetterPicker::Draw(RenderWindow& window) const
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-void LetterPicker::SetLetters(const String& letters)
+void LetterPicker::SetLetters(const string& letters)
 {
 	Vector2f curPos(m_PickerPosition);
 	curPos.x += m_ButtonPadding.left;
@@ -63,7 +63,7 @@ void LetterPicker::SetLetters(const String& letters)
 
 	UI32 curLetter = 0;
 	
-	m_Rows = ceil(letters.getSize() / static_cast<F32>(m_Cols));
+	m_Rows = ceil(StringUtils::U8Length(letters) / static_cast<F32>(m_Cols));
 
 	// Compute the picker actual drawable size
 	Vector2f drawableArea(
@@ -77,11 +77,14 @@ void LetterPicker::SetLetters(const String& letters)
 	m_ButtonSize = Vector2f(drawableArea.x / static_cast<F32>(m_Cols),
 							drawableArea.y / static_cast<F32>(m_Rows));
 
+	// Get the UTF-8 individual codepoints to iterate over them
+	auto utf8letters = StringUtils::U8Split(letters);
+
 	for (UI32 i = 0; i < m_Rows; ++i)
 	{
 		for (UI32 j = 0; j < m_Cols; ++j)
 		{
-			LetterButton button(letters[curLetter], *m_Font, m_ButtonSize, m_LetterScale);
+			LetterButton button(utf8letters[curLetter], m_Font, m_ButtonSize, m_LetterScale);
 			button.SetPosition(curPos);
 			button.SetCallback(m_LetterCallback);
 
@@ -90,7 +93,7 @@ void LetterPicker::SetLetters(const String& letters)
 			curPos.x += m_ButtonSize.x + m_ButtonPadding.left + m_ButtonPadding.width;
 
 			++curLetter;
-			if (curLetter == letters.getSize())
+			if (curLetter == StringUtils::U8Length(letters))
 				return;
 		}
 
@@ -101,7 +104,7 @@ void LetterPicker::SetLetters(const String& letters)
 		// Set last row's alignment
 		if (i + 2 == m_Rows)
 		{
-			UI32 remainingLetters = letters.getSize() - (i + 1) * m_Cols;
+			UI32 remainingLetters = StringUtils::U8Length(letters) - (i + 1) * m_Cols;
 			UI32 spaceToFill = remainingLetters * (m_ButtonPadding.left +
 				m_ButtonPadding.width + m_ButtonSize.x);
 			UI32 emptySpace = m_PickerSize.x - spaceToFill;

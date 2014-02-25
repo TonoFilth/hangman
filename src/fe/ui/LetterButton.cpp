@@ -9,9 +9,10 @@ namespace fe
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-LetterButton::LetterButton(const wchar_t letter, const Font& font,
-	const Vector2f& buttonSize, F32 letterScale) :
-	m_Label(letter, font),
+LetterButton::LetterButton(const string& letter, const TFontPtr& font,
+						   const Vector2f& buttonSize, F32 letterScale) :
+	m_Label(StringUtils::U8toU32(letter).data(), *font),
+	m_Font(font),
 	m_Callback(nullptr)
 {
 	m_Background.setSize(buttonSize);
@@ -20,13 +21,10 @@ LetterButton::LetterButton(const wchar_t letter, const Font& font,
 	m_Label.setColor(Color::White);
 
 	FitLabel(letterScale);
-	//TransformableSetOrigin(m_Label, THAlign::CENTER, TVAlign::CENTER);
-
+	
 	auto bPos(m_Background.getPosition());
 	auto lBounds(m_Label.getLocalBounds());
 
-	//Vector2f letterPos(bPos.x + buttonSize.x  * 0.5,
-	//				   bPos.y + buttonSize.y  * 0.5);
 	Vector2f letterPos(bPos.x + buttonSize.x * 0.5 - (lBounds.width + lBounds.left) * 0.5,
 					   bPos.y + buttonSize.y * 0.5 - (lBounds.height + lBounds.top) * 0.5 - lBounds.top * 0.5);
 
@@ -57,9 +55,10 @@ LetterButton::~LetterButton()
 // =============================================================================
 void LetterButton::Copy(const LetterButton& toCopy)
 {
-	m_Label   = toCopy.m_Label;
-	m_Background   = toCopy.m_Background;
-	m_Callback = toCopy.m_Callback;
+	m_Label   	 = toCopy.m_Label;
+	m_Font		 = toCopy.m_Font;
+	m_Background = toCopy.m_Background;
+	m_Callback 	 = toCopy.m_Callback;
 }
 
 void LetterButton::FitLabel(const F32 letterScale)
@@ -105,7 +104,7 @@ bool LetterButton::HandleInput(const RenderWindow& window)
 		mousePos.x >= lPos.x && mousePos.x <= lPos.x + lBounds.width &&
 		mousePos.y >= lPos.y && mousePos.y <= lPos.y + lBounds.height)
 	{
-		m_Callback(this, m_Label.getString()[0]);
+		m_Callback(this, m_Label.getString());
 		return true;
 	}
 
@@ -145,9 +144,9 @@ void LetterButton::Draw(RenderWindow& window) const
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-wchar_t LetterButton::GetLetter() const
+string LetterButton::GetLetter() const
 {
-	return m_Label.getString()[0];
+	return StringUtils::SFMLtoU8(m_Label.getString());
 }
 
 Vector2f LetterButton::GetPosition() const
@@ -155,9 +154,9 @@ Vector2f LetterButton::GetPosition() const
 	return m_Background.getPosition();
 }
 
-void LetterButton::SetLetter(const wchar_t letter)
+void LetterButton::SetLetter(const string& letter)
 {
-	m_Label.setString(letter);
+	m_Label.setString(StringUtils::U8toSFML(letter));
 }
 
 void LetterButton::SetLetterColor(const Color& color)
