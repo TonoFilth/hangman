@@ -1,7 +1,6 @@
 #include "fe/db/WordDAOSqlite.h"
 
 using namespace std;
-using namespace sf;
 using namespace Kompex;
 
 namespace fe
@@ -20,6 +19,18 @@ WordDAOSqlite::~WordDAOSqlite()
 }
 
 // =============================================================================
+//	PRIVATE AND PROTECTED METHODS
+// =============================================================================
+Word WordDAOSqlite::CreateWord(const TWordID id,
+							   const string& str,
+							   const string& hint)
+{
+	Word word(str, hint);
+	word.m_ID = id;
+	return word;
+}
+
+// =============================================================================
 //	VIRTUAL METHODS
 // =============================================================================
 bool WordDAOSqlite::InsertWord(const TCategoryID categoryID, const Word& word)
@@ -35,7 +46,7 @@ bool WordDAOSqlite::InsertWord(const TCategoryID categoryID, const Word& word)
 	try
 	{
 		s.Sql("INSERT INTO Words(word, hint) VALUES(@word, @hint)");
-		s.BindString(1, word.GetWord());
+		s.BindString(1, word.GetString());
 
 		if (word.GetHint() != "")
 			s.BindString(2, word.GetHint());
@@ -50,9 +61,6 @@ bool WordDAOSqlite::InsertWord(const TCategoryID categoryID, const Word& word)
 		s.BindInt(1, categoryID);
 		s.BindInt(2, wordID);
 		s.FetchRow();
-		s.FreeQuery();
-
-		return true;
 	}
 	catch (SQLiteException& ex)
 	{
@@ -62,8 +70,7 @@ bool WordDAOSqlite::InsertWord(const TCategoryID categoryID, const Word& word)
 	}
 
 	s.FreeQuery();
-
-	return false;
+	return true;
 }
 
 TWordVec WordDAOSqlite::GetWordsByCategoryID(const TCategoryID categoryID)
@@ -79,16 +86,11 @@ TWordVec WordDAOSqlite::GetWordsByCategoryID(const TCategoryID categoryID)
 
 	try
 	{
-		s.Sql("SELECT word, hint FROM Words, CategoryWords WHERE category_id=@id AND Words.id=CategoryWords.word_id");
+		s.Sql("SELECT Words.id, word, hint FROM Words, CategoryWords WHERE category_id=@id AND Words.id=CategoryWords.word_id");
 		s.BindInt(1, categoryID);
 
 		while (s.FetchRow())
-		{
-			if (s.GetColumnString(1) == "")
-				words.push_back(Word(s.GetColumnString(0), ""));
-			else
-				words.push_back(Word(s.GetColumnString(0), s.GetColumnString(1)));
-		}
+			words.push_back(CreateWord(s.GetColumnInt(0), s.GetColumnString(1), s.GetColumnString(2)));
 	}
 	catch (SQLiteException& ex)
 	{
@@ -98,7 +100,6 @@ TWordVec WordDAOSqlite::GetWordsByCategoryID(const TCategoryID categoryID)
 	}
 
 	s.FreeQuery();
-
 	return words;
 }
 

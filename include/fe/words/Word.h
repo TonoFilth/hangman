@@ -1,42 +1,56 @@
 #ifndef __WORD_H__
 #define __WORD_H__
 
+#include <iostream>
 #include <vector>
-#include <SFML/Graphics.hpp>
+
+#include "fe/types/BasicTypes.h"
 
 namespace fe
 {
 
 class Word;
+class WordDAOSqlite;
 
-extern const Word InvalidWord;
-
+typedef UI32			  TWordID;
 typedef std::vector<Word> TWordVec;
+
+extern const std::string DEF_WORD_STRING;
+extern const std::string DEF_WORD_HINT;
+extern const TWordID ERR_WORD_ID;
+extern const Word InvalidWord;
 
 class Word
 {
 private:
-	std::string m_Word;
+	friend class WordDAOSqlite;
+	static TWordID WORD_ID;
+
+	TWordID	 	m_ID;
+	std::string m_String;
 	std::string m_Hint;
 
 	void Copy(const Word& toCopy);
 
 public:
-	Word();
-	Word(const std::string& word, const std::string& hint = std::string(u8""));
+	Word(const std::string& str = DEF_WORD_STRING, const std::string& hint = DEF_WORD_HINT);
 	Word(const Word& toCopy);
 	Word& operator=(const Word& toCopy);
-	~Word();
+	virtual ~Word();
 
 	friend bool operator==(const Word& wordA, const Word& wordB);
 	friend bool operator!=(const Word& wordA, const Word& wordB);
 
-	const std::string& GetWord() const;
+	TWordID GetID() const;
+	const std::string& GetString() const;
 	const std::string& GetHint() const;
-	void SetWord(const std::string& word);
+
+	void SetString(const std::string& str);
 	void SetHint(const std::string& hint);
 
 	bool IsValid() const;
+
+	void PrintDebug(const std::string& spaces = "") const;
 };
 
 bool operator==(const Word& wordA, const Word& wordB);

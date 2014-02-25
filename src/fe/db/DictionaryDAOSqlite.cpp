@@ -20,6 +20,24 @@ DictionaryDAOSqlite::~DictionaryDAOSqlite()
 }
 
 // =============================================================================
+//	PRIVATE AND PROTECTED METHODS
+// =============================================================================
+TDictionaryPtr DictionaryDAOSqlite::CreateDictionary(const TDictionaryID id, const string& name,
+													 const string& lang, const string& cset,
+													 const string& fontFile)
+{
+	TFontPtr font = make_shared<Font>();
+
+	if (!font->loadFromFile(fontFile))
+		return nullptr;
+
+	auto d = make_shared<Dictionary>(font, name, lang, cset);
+	d->m_ID = id;
+
+	return d;
+}
+
+// =============================================================================
 //	VIRTUAL METHODS
 // =============================================================================
 TDictionaryID DictionaryDAOSqlite::InsertDictionary(const string& name,
@@ -30,7 +48,7 @@ TDictionaryID DictionaryDAOSqlite::InsertDictionary(const string& name,
 	if (Exists(name))
 	{
 		cerr << "A dictionary with name " << name << " already exists" << endl;
-		return INVALID_DICTIONARY_ID;
+		return InvalidDictionary.GetID();
 	}
 
 	SQLiteStatement s(m_Database.get());
@@ -49,7 +67,7 @@ TDictionaryID DictionaryDAOSqlite::InsertDictionary(const string& name,
 	{
 		ex.Show();
 		s.FreeQuery();
-		return INVALID_DICTIONARY_ID;
+		return InvalidDictionary.GetID();
 	}
 
 	s.FreeQuery();
@@ -58,7 +76,7 @@ TDictionaryID DictionaryDAOSqlite::InsertDictionary(const string& name,
 
 TDictionaryPtr DictionaryDAOSqlite::GetDictionaryByID(const TDictionaryID id)
 {
-	TDictionaryPtr dictionary = nullptr;
+	TDictionaryPtr dictionary(nullptr);
 	SQLiteStatement s(m_Database.get());
 
 	try
@@ -66,12 +84,16 @@ TDictionaryPtr DictionaryDAOSqlite::GetDictionaryByID(const TDictionaryID id)
 		s.Sql("SELECT * FROM Dictionaries WHERE id=@id");
 		s.BindInt(1, id);
 
-		if (s.FetchRow())
-			dictionary = make_shared<SqliteDictionary>(s.GetColumnInt(0),
-													   s.GetColumnString(1),
-													   s.GetColumnString(2),
-													   s.GetColumnString(3),
-													   s.GetColumnString(4));
+		if (s.FetchRow() && (dictionary = CreateDictionary(s.GetColumnInt(0),
+														   s.GetColumnString(1),
+														   s.GetColumnString(2),
+														   s.GetColumnString(3),
+														   s.GetColumnString(4))) == nullptr)
+		{
+			cerr << "Can't create dictionary " << id << endl;
+			s.FreeQuery();
+			return nullptr;
+		}
 	}
 	catch (SQLiteException& ex)
 	{
@@ -80,12 +102,15 @@ TDictionaryPtr DictionaryDAOSqlite::GetDictionaryByID(const TDictionaryID id)
 		return nullptr;
 	}
 
+	s.FreeQuery();
 	return dictionary;
 }
 
-TDictionaryList DictionaryDAOSqlite::GetAllDictionaries()
+TDictionaryVec DictionaryDAOSqlite::GetAllDictionaries()
 {
-	TDictionaryList list;
+	TDictionaryVec dictionaries;
+	TDictionaryPtr dictionary;
+
 	SQLiteStatement s(m_Database.get());
 
 	try
@@ -93,20 +118,29 @@ TDictionaryList DictionaryDAOSqlite::GetAllDictionaries()
 		s.Sql("SELECT * FROM Dictionaries");
 
 		while (s.FetchRow())
-			list.push_back(make_shared<SqliteDictionary>(s.GetColumnInt(0),
-													   	 s.GetColumnString(1),
-													   	 s.GetColumnString(2),
-													   	 s.GetColumnString(3),
-													   	 s.GetColumnString(4)));
+		{
+			if ((dictionary = CreateDictionary(s.GetColumnInt(0),
+											   s.GetColumnString(1),
+											   s.GetColumnString(2),
+											   s.GetColumnString(3),
+											   s.GetColumnString(4))) == nullptr)
+			{
+				cerr << "Can't create dictionary " << s.GetColumnInt(0) << endl;
+				s.FreeQuery();
+				return TDictionaryVec();
+			}
+
+			dictionaries.push_back(dictionary);
+		}
 	}
 	catch (SQLiteException& ex)
 	{
 		ex.Show();
 		s.FreeQuery();
-		return list;
+		return TDictionaryVec();
 	}
 
-	return list;
+	return dictionaries;
 }
 
 bool DictionaryDAOSqlite::Exists(const TDictionaryID id)

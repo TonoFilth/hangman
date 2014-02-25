@@ -1,7 +1,6 @@
 #include "fe/words/Dictionary.h"
 
 using namespace std;
-using namespace sf;
 
 namespace fe
 {
@@ -9,34 +8,33 @@ namespace fe
 // =============================================================================
 //	CONSTANTS
 // =============================================================================
-const TDictionaryID INVALID_DICTIONARY_ID = 0;
-const TCategoryID INVALID_CATEGORY_ID = 0;
+const string DEF_DICTIONARY_NAME("Default Dictionary Name");
+const string DEF_DICTIONARY_LANG("en-EN");
+const string DEF_DICTIONARY_CHARACTER_SET("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+const TDictionaryID ERR_DICTIONARY_ID(0);
+const Dictionary InvalidDictionary(nullptr,
+								   "365E36C4-714E-4920-BA72-B9F3421B40B6",
+								   "A39098EC-B0E4-4951-960E-1414A4BDED94",
+								   "BEEF6007-CDE7-43EE-ACEB-655E0F5BB24C");
 
-const Category AnyCategory(666, "any");
-const Category InvalidCategory(INVALID_CATEGORY_ID, "INVALID");
+// =============================================================================
+//	STATIC FIELDS
+// =============================================================================
+TDictionaryID Dictionary::DICTIONARY_ID = 0;
 
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-Dictionary::Dictionary(const string& name,
-					   const string& lang,
-					   const string& characterSet,
-					   const string& fontFile,
-					   const TCategoryList& categoryList) :
-		m_Name(name),
-		m_Lang(lang),
-		m_CharacterSet(characterSet),
-		m_Font(make_shared<Font>()),
-		m_CategoryID(0)
+Dictionary::Dictionary(const TFontPtr& font,
+			   		   const string& name,
+			   		   const string& lang,
+			   		   const string& cset) :
+	m_ID(DICTIONARY_ID++),
+	m_Name(name),
+	m_Lang(lang),
+	m_CharacterSet(cset),
+	m_Font(font)
 {
-	if (!m_Font->loadFromFile(fontFile))
-	{
-		cerr << "Can't load font " << fontFile << endl;
-		throw;
-	}
-
-	for (auto& category : categoryList)
-		m_WordMap[category.id] = TWordVec();
 }
 
 Dictionary::~Dictionary()
@@ -46,157 +44,86 @@ Dictionary::~Dictionary()
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-bool Dictionary::AddWord(const Word& word, const TCategoryID categoryID)
+void Dictionary::AddCategory(const Category& category)
 {
-	if (m_WordMap.count(categoryID) == 0)
-	{
-		cerr << "Category " << categoryID << " doesn't exists" << endl;
-		return false;
-	}
+	if (ContainsCategory(category))
+		return;
 
-	m_WordMap[categoryID].push_back(word);
-
-	return true;
+	m_CategoryMap[category.GetID()] = category;
 }
 
-TCategoryID Dictionary::AddCategory(const string& categoryName)
+void Dictionary::AddCategories(const TCategoryVec& categories)
 {
-	for (auto& category : m_Categories)
-	{
-		if (category.name == categoryName)
-		{
-			cerr << "Category " << categoryName << " already exists" << endl;
-			return 0;
-		}
-	}
-
-	TCategory category(m_CategoryID, categoryName);
-	m_Categories.push_back(category);
-	m_CategoryID++;
-	m_WordMap[category.id] = TWordVec();
-
-	return category.id;
+	for (auto& category : categories)
+		AddCategory(category);
 }
 
-bool Dictionary::AddCategory(const TCategory& category)
+void Dictionary::RemoveCategory(const Category& category)
 {
-	if (m_WordMap.count(category.id) == 1)
-	{
-		cerr << "Category with id " << category.id << " already exists" << endl;
-		return false;
-	}
-
-	m_WordMap[category.id] = TWordVec();
-	return true;
+	m_CategoryMap.erase(category.GetID());
 }
 
-bool Dictionary::RemoveWord(const Word& word)
+void Dictionary::RemoveCategories(const TCategoryVec& categories)
 {
-	bool erased = false;
-
-	for (auto& kv : m_WordMap)
-	{
-		for (auto it = kv.second.begin(); it != kv.second.end(); ++it)
-		{
-			if (*it == word)
-			{
-				kv.second.erase(it);
-				erased = true;
-				break;
-			}
-		}
-	}
-
-	return erased;
-}
-
-bool Dictionary::RemoveCategory(const TCategoryID categoryID)
-{
-	return m_WordMap.erase(categoryID) == 1;
+	for (auto& category : categories)
+		RemoveCategory(category);
 }
 
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-string Dictionary::GetName() const
-{
-	return m_Name;
-}
+TDictionaryID Dictionary::GetID() 			const { return m_ID; 			}
+string 		  Dictionary::GetName() 		const { return m_Name; 			}
+string 		  Dictionary::GetLanguage() 	const { return m_Lang; 			}
+string 		  Dictionary::GetCharacterSet() const { return m_CharacterSet;	}
+TFontPtr 	  Dictionary::GetFont() 		const { return m_Font; 			}
 
-string Dictionary::GetLanguage() const
-{
-	return m_Lang;
-}
-
-Word Dictionary::GetWord(const TCategoryID categoryID, const UI32 index)
-{
-	if (m_WordMap.count(categoryID) == 0)
-	{
-		cerr << "Category " << categoryID << " doesn't exists" << endl;
-		return Word();
-	}
-
-	if (m_WordMap[categoryID].size() <= index)
-	{
-		cerr << "Index out of range: " << index << endl;
-		return Word();
-	}
-
-	return m_WordMap[categoryID][index];
-}
-
-UI32 Dictionary::GetWordCount() const
-{
-	UI32 wc = 0;
-
-	for (auto& kv : m_WordMap)
-		wc += kv.second.size();
-
-	return wc;
-}
-
-UI32 Dictionary::GetWordCountByCategory(const TCategoryID categoryID) const
-{
-	if (m_WordMap.count(categoryID) == 0)
-	{
-		cerr << "Category " << categoryID << " doesn't exists" << endl;
-		return 0;
-	}
-
-	return m_WordMap.find(categoryID)->second.size();
-}
-
-UI32 Dictionary::GetCategoryCount() const
-{
-	return m_Categories.size();
-}
-
-TCategoryList Dictionary::GetCategoryList() const
-{
-	return m_Categories;
-}
-
-string Dictionary::GetCharacterSet() const
-{
-	return m_CharacterSet;
-}
-
-TFontPtr Dictionary::GetFont() const
-{
-	return m_Font;
-}
+void Dictionary::SetName(const string& name)	  	 { m_Name = name; 		  }
+void Dictionary::SetLanguage(const string& lang)  	 { m_Lang = lang;  		  }
+void Dictionary::SetCharacterSet(const string& cset) { m_CharacterSet = cset; }
+void Dictionary::SetFont(const TFontPtr& font)		 { m_Font = font; 		  }
 
 // =============================================================================
 //	QUESTION METHODS
 // =============================================================================
-bool Dictionary::IsEmpty() const
+bool Dictionary::IsEmpty() const { return m_CategoryMap.empty(); }
+
+bool Dictionary::IsValid() const
 {
-	return m_WordMap.empty();
+	return m_ID   != ERR_DICTIONARY_ID        ||
+		   m_Name != InvalidDictionary.m_Name ||
+		   m_Lang != InvalidDictionary.m_Lang ||
+		   m_CharacterSet != InvalidDictionary.m_CharacterSet;
 }
 
-bool Dictionary::ContainsCategory(const TCategoryID categoryID) const
+bool Dictionary::ContainsCategory(const Category& category) const
 {
-	return m_WordMap.count(categoryID) == 1;
+	return m_CategoryMap.count(category.GetID()) == 1;
+}
+
+bool Dictionary::ContainsWord(const Word& word) const
+{
+	for (auto& kv : m_CategoryMap)
+		if (kv.second.ContainsWord(word))
+			return true;
+
+	return false;
+}
+
+// =============================================================================
+//	DEBUG METHODS
+// =============================================================================
+void Dictionary::PrintDebug(const string& spaces) const
+{
+	cout << spaces << "DICTIONARY" << endl;
+	cout << spaces << "  ID:            " << m_ID << endl;
+	cout << spaces << "  Name:          \"" << m_Name << "\"" << endl;
+	cout << spaces << "  Language:      \"" << m_Lang << "\"" << endl;
+	cout << spaces << "  Character Set: \"" << m_CharacterSet << "\"" << endl;
+	cout << spaces << "  Categories:" << endl;
+
+	for (auto& kv : m_CategoryMap)
+		kv.second.PrintDebug(spaces + "  ");
 }
 
 }

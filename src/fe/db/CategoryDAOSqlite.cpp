@@ -1,7 +1,6 @@
 #include "fe/db/CategoryDAOSqlite.h"
 
 using namespace std;
-using namespace sf;
 using namespace Kompex;
 
 namespace fe
@@ -20,6 +19,17 @@ CategoryDAOSqlite::~CategoryDAOSqlite()
 }
 
 // =============================================================================
+//	PRIVATE AND PROTECTED METHODS
+// =============================================================================
+Category CategoryDAOSqlite::CreateCategory(const TCategoryID id,
+										   const string& name)
+{
+	Category category(name);
+	category.m_ID = id;
+	return category;
+}
+
+// =============================================================================
 //	VIRTUAL METHODS
 // =============================================================================
 TCategoryID CategoryDAOSqlite::InsertCategory(const TDictionaryID dictionaryID,
@@ -28,16 +38,17 @@ TCategoryID CategoryDAOSqlite::InsertCategory(const TDictionaryID dictionaryID,
 	if (Exists(name))
 	{
 		cerr << "Category " << name << " already exists" << endl;
-		return INVALID_CATEGORY_ID;
+		return InvalidCategory.GetID();
 	}
 
 	if (!DictionaryDAO::Exists(dictionaryID))
 	{
 		cerr << "Dictionary with id " << dictionaryID << " doesn't exits" << endl;
-		return INVALID_CATEGORY_ID;
+		return InvalidCategory.GetID();
 	}
 
 	SQLiteStatement s(m_Database.get());
+	TCategoryID categoryID = InvalidCategory.GetID();
 
 	try
 	{
@@ -45,31 +56,29 @@ TCategoryID CategoryDAOSqlite::InsertCategory(const TDictionaryID dictionaryID,
 		s.BindString(1, name);
 		s.FetchRow();
 
-		auto categoryID = m_Database->GetLastInsertRowId();
+		categoryID = m_Database->GetLastInsertRowId();
 		s.FreeQuery();
 
 		s.Sql("INSERT INTO DictionaryCategories(dictionary_id, category_id) VALUES(@did, @cid)");
 		s.BindInt(1, dictionaryID);
 		s.BindInt(2, categoryID);
 		s.FetchRow();
-
-		s.FreeQuery();
-		return categoryID;
 	}
 	catch (SQLiteException& ex)
 	{
 		ex.Show();
 		s.FreeQuery();
-		return INVALID_CATEGORY_ID;
+		return InvalidCategory.GetID();
 	}
-
+	
 	s.FreeQuery();
-	return INVALID_CATEGORY_ID;
+	return categoryID;
 }
 
-TCategory CategoryDAOSqlite::GetCategoryByID(const TCategoryID id)
+Category CategoryDAOSqlite::GetCategoryByID(const TCategoryID id)
 {
 	SQLiteStatement s(m_Database.get());
+	Category category(InvalidCategory);
 
 	try
 	{
@@ -79,9 +88,7 @@ TCategory CategoryDAOSqlite::GetCategoryByID(const TCategoryID id)
 		if (!s.FetchRow())
 			return InvalidCategory;
 
-		TCategory c(s.GetColumnInt(0), s.GetColumnString(1));
-		s.FreeQuery();
-		return c;
+		category = CreateCategory(s.GetColumnInt(0), s.GetColumnString(1));
 	}
 	catch (SQLiteException& ex)
 	{
@@ -90,18 +97,19 @@ TCategory CategoryDAOSqlite::GetCategoryByID(const TCategoryID id)
 		return InvalidCategory;
 	}
 
-	return InvalidCategory;
+	s.FreeQuery();
+	return category;
 }
 
-TCategoryList CategoryDAOSqlite::GetCategoriesByDictionaryID(const TDictionaryID id)
+TCategoryVec CategoryDAOSqlite::GetCategoriesByDictionaryID(const TDictionaryID id)
 {
 	if (!DictionaryDAO::Exists(id))
 	{
 		cerr << "Dictionary with id " << id << " doesn't exists" << endl;
-		return TCategoryList();
+		return TCategoryVec();
 	}
 
-	TCategoryList list;
+	TCategoryVec categories;
 	SQLiteStatement s(m_Database.get());
 
 	try
@@ -110,17 +118,17 @@ TCategoryList CategoryDAOSqlite::GetCategoriesByDictionaryID(const TDictionaryID
 		s.BindInt(1, id);
 
 		while (s.FetchRow())
-			list.push_back(TCategory(s.GetColumnInt(0), s.GetColumnString(1)));
+			categories.push_back(CreateCategory(s.GetColumnInt(0), s.GetColumnString(1)));
 	}
 	catch (SQLiteException& ex)
 	{
 		ex.Show();
 		s.FreeQuery();
-		return TCategoryList();
+		return TCategoryVec();
 	}
 
 	s.FreeQuery();
-	return list;
+	return categories;
 }
 
 bool CategoryDAOSqlite::Exists(const TCategoryID id)

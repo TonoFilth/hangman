@@ -1,99 +1,70 @@
-#ifndef __WORD_DICTIONARY_H__
-#define __WORD_DICTIONARY_H__
+#ifndef __DICTIONARY_H__
+#define __DICTIONARY_H__
 
-#include <iostream>
-#include <list>
-#include <SFML/Graphics.hpp>
-
-#include "fe/words/Word.h"
-#include "fe/types/BasicTypes.h"
+#include "fe/words/Category.h"
 #include "fe/types/PointerTypes.h"
 
 namespace fe
 {
 
 class Dictionary;
-struct Category;
+class DictionaryDAOSqlite;
 
-typedef UI32 							TDictionaryID;
-typedef Category 					  	TCategory;
-typedef UI32 						  	TCategoryID;
-typedef std::list<TCategory> 		  	TCategoryList;
-typedef std::list<TCategoryID>			TCategoryIDList;
-typedef std::map<TCategoryID, TWordVec> TWordMap;
-typedef std::shared_ptr<Dictionary>	  	TDictionaryPtr;
-typedef std::list<TDictionaryPtr>		TDictionaryList;
+typedef UI32 						TDictionaryID;
+typedef std::shared_ptr<Dictionary> TDictionaryPtr;
+typedef std::vector<TDictionaryPtr>	TDictionaryVec;
 
-extern const TDictionaryID INVALID_DICTIONARY_ID;
-extern const TCategoryID INVALID_CATEGORY_ID;
-
-extern const Category AnyCategory;
-extern const Category InvalidCategory;
-
-struct Category
-{
-	Category(const TCategoryID i, const std::string& n) :
-		id(i), name(n)
-	{
-	}
-
-	Category& operator=(const Category& toCopy)
-	{
-		if (this == &toCopy)
-			return *this;
-
-		id 	 = toCopy.id;
-		name = toCopy.name;
-
-		return *this;
-	}
-
-	TCategoryID  id;
-	std::string  name;
-};
+extern const std::string DEF_DICTIONARY_NAME;
+extern const std::string DEF_DICTIONARY_LANG;
+extern const std::string DEF_DICTIONARY_CHARACTER_SET;
+extern const TDictionaryID ERR_DICTIONARY_ID;
+extern const Dictionary InvalidDictionary;
 
 class Dictionary
 {
 private:
-	TWordMap    m_WordMap;
-	std::string m_Name;
-	std::string m_Lang;
-	std::string m_CharacterSet;
-	TFontPtr    m_Font;
+	friend class DictionaryDAOSqlite;
+	static TDictionaryID DICTIONARY_ID;
 
-	TCategoryID   m_CategoryID;
-	TCategoryList m_Categories;
+	TDictionaryID m_ID;
+	std::string   m_Name;
+	std::string   m_Lang;
+	std::string   m_CharacterSet;
+	TFontPtr      m_Font;
+	TCategoryMap  m_CategoryMap;
 
 	Dictionary(const Dictionary& toCopy);
 	Dictionary& operator=(const Dictionary& toCopy);
 
 public:
-	Dictionary(const std::string& name,
-			   const std::string& lang,
-			   const std::string& characterSet,
-			   const std::string& fontFile,
-			   const TCategoryList& categoryList = TCategoryList());
+	Dictionary(const TFontPtr& font,
+			   const std::string& name = DEF_DICTIONARY_NAME,
+			   const std::string& lang = DEF_DICTIONARY_LANG,
+			   const std::string& cset = DEF_DICTIONARY_CHARACTER_SET);
 	virtual ~Dictionary();
 
-	virtual Word GetWord(const TCategoryID categoryID = AnyCategory.id, const UI32 index = 0);
-	virtual bool AddWord(const Word& word, const TCategoryID categoryID = AnyCategory.id);
-	virtual TCategoryID AddCategory(const std::string& categoryName);
-	virtual bool AddCategory(const TCategory& category);
-	virtual bool RemoveWord(const Word& word);
-	virtual bool RemoveCategory(const TCategoryID categoryID); 
-	
-	std::string GetName() const;
-	std::string GetLanguage() const;
+	void AddCategory(const Category& category);
+	void AddCategories(const TCategoryVec& categories);
+	void RemoveCategory(const Category& category);
+	void RemoveCategories(const TCategoryVec& categories);
 
-	UI32 GetWordCount() const;
-	UI32 GetWordCountByCategory(const TCategoryID categoryID) const;
-	UI32 GetCategoryCount() const;
-	TCategoryList GetCategoryList() const;
-	std::string GetCharacterSet() const;
-	TFontPtr GetFont() const;
+	TDictionaryID GetID() 			const;
+	std::string   GetName() 		const;
+	std::string   GetLanguage() 	const;
+	std::string   GetCharacterSet() const;
+	TFontPtr	  GetFont() 		const;
+
+	void SetName(const std::string& name);
+	void SetLanguage(const std::string& lang);
+	void SetCharacterSet(const std::string& cset);
+	void SetFont(const TFontPtr& font);
 
 	bool IsEmpty() const;
-	bool ContainsCategory(const TCategoryID categoryID) const;
+	bool IsValid() const;
+	bool ContainsCategory(const Category& category) const;
+	bool ContainsWord(const Word& word) const;
+
+	void PrintDebug(const std::string& spaces = "") const;
 };
 
 }

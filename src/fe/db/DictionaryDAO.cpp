@@ -1,8 +1,6 @@
 #include "fe/db/DictionaryDAO.h"
 
 using namespace std;
-using namespace sf;
-using namespace Kompex;
 
 namespace fe
 {
@@ -28,7 +26,7 @@ TDictionaryPtr DictionaryDAO::GetDictionaryByID(const TDictionaryID id)
 	return m_DAO->GetDictionaryByID(id);
 }
 
-TDictionaryList DictionaryDAO::GetAllDictionaries()
+TDictionaryVec DictionaryDAO::GetAllDictionaries()
 {
 	return m_DAO->GetAllDictionaries();
 }

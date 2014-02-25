@@ -1,8 +1,6 @@
 #include "fe/db/WordDAO.h"
 
 using namespace std;
-using namespace sf;
-using namespace Kompex;
 
 namespace fe
 {

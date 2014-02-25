@@ -11,6 +11,9 @@ class CategoryDAOSqlite : public ICategoryDAO
 private:
 	TDatabasePtr m_Database;
 
+	Category CreateCategory(const TCategoryID id,
+							const std::string& name);
+
 	CategoryDAOSqlite(const CategoryDAOSqlite& toCopy);
 	CategoryDAOSqlite& operator=(const CategoryDAOSqlite& toCopy);
 
@@ -20,8 +23,8 @@ public:
 
 	virtual TCategoryID InsertCategory(const TDictionaryID dictionaryID,
 									   const std::string& name);
-	virtual TCategory GetCategoryByID(const TCategoryID id);
-	virtual TCategoryList GetCategoriesByDictionaryID(const TDictionaryID id);
+	virtual Category GetCategoryByID(const TCategoryID id);
+	virtual TCategoryVec GetCategoriesByDictionaryID(const TDictionaryID id);
 
 	virtual bool Exists(const TCategoryID id);
 	virtual bool Exists(const std::string& name);

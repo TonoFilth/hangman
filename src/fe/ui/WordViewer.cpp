@@ -11,7 +11,7 @@ namespace fe
 // =============================================================================
 WordViewer::WordViewer(const UI32 width, const UI32 height, const TFontPtr& font,
 	const TTexturePtr& lUndTexture) :
-	m_Word("undefined"),
+	m_Word(InvalidWord),
 	m_Size(width, height),
 	m_Position(0, 0),
 	m_Callback(nullptr),
@@ -34,7 +34,7 @@ void WordViewer::GenerateLetters()
 {
 	m_UnderlineSprites.clear();
 
-	auto letterCount = StringUtils::U8Length(m_Word.GetWord());
+	auto letterCount = StringUtils::U8Length(m_Word.GetString());
 	auto txSize = m_UnderlineTexture->getSize();
 
 	Vector2f drawableArea(
@@ -48,7 +48,7 @@ void WordViewer::GenerateLetters()
 					m_LetterPadding.top  + m_Position.y);
 
 	// Get the UTF-8 individual codepoints to iterate over them
-	auto utf8letters = StringUtils::U8Split(m_Word.GetWord());
+	auto utf8letters = StringUtils::U8Split(m_Word.GetString());
 
 	for (UI32 i = 0; i < letterCount; ++i)
 	{

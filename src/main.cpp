@@ -1,22 +1,14 @@
 #include <iostream>
-#include "fe/hangman/Hangman.h"
 #include "fe/hangman/factory/HangmanFactory.h"
 #include "fe/hangman/factory/OrderedBodyBuilder.h"
-#include "fe/hangman/factory/StubBodyPartExtractor.h"
 #include "fe/hangman/factory/JsonBodyPartExtractor.h"
-#include "fe/words/Word.h"
-#include "fe/ui/LetterButton.h"
 #include "fe/ui/LetterPicker.h"
 #include "fe/ui/WordViewer.h"
-#include "fe/types/UITypes.h"
 #include "fe/words/Dictionary.h"
-#include "fe/words/RandomDictionary.h"
-#include "fe/words/SqliteDictionary.h"
-#include "fe/db/DictionaryDAOSqlite.h"
-#include "fe/db/CategoryDAOSqlite.h"
+
 #include "fe/db/WordDAOSqlite.h"
-#include "fe/utils/StringUtils.h"
-#include "utf8cpp/utf8.h"
+#include "fe/db/CategoryDAOSqlite.h"
+#include "fe/db/DictionaryDAOSqlite.h"
 
 using namespace std;
 using namespace sf;
@@ -45,22 +37,21 @@ int main(int argc, char** argv)
 	guides.setPosition(0, 0);
 
 	TTexturePtr txUnderline = make_shared<Texture>();
-	TFontPtr exoFont = make_shared<Font>(), osakaFont = make_shared<Font>();
-
 	txUnderline->loadFromFile("assets/images/underline.png");
+
+	TFontPtr exoFont    = make_shared<Font>(),
+			 osakaFont  = make_shared<Font>(),
+			 monacoFont = make_shared<Font>();
+
 	exoFont->loadFromFile("assets/fonts/Exo-Black.otf");
 	osakaFont->loadFromFile("assets/fonts/osaka.unicode.ttf");
-
-	//TDictionaryPtr dictionary = make_shared<RandomDictionary>("MyDictionary", "es-ES", L"ABCDEFG", "assets/fonts/Exo-Black.otf");
-	//TCategoryID cid = dictionary->AddCategory("animals");
-	//dictionary->AddWord(Word(L"DOG"), cid);
-	//dictionary->AddWord(Word(L"CAT"), cid);
+	monacoFont->loadFromFile("assets/fonts/Monaco.ttf");
 
 	TDatabasePtr database = make_shared<SQLiteDatabase>("hangman.sqlite", SQLITE_OPEN_READWRITE, nullptr);
 
 	TIDictionaryDAOPtr dictionaryDAO = make_shared<DictionaryDAOSqlite>(database);
-	TICategoryDAOPtr categoryDAO = make_shared<CategoryDAOSqlite>(database);
-	TIWordDAOPtr wordDAO = make_shared<WordDAOSqlite>(database);
+	TICategoryDAOPtr   categoryDAO 	 = make_shared<CategoryDAOSqlite>(database);
+	TIWordDAOPtr 	   wordDAO 		 = make_shared<WordDAOSqlite>(database);
 
 	DictionaryDAO::SetDAO(dictionaryDAO);
 	CategoryDAO::SetDAO(categoryDAO);
@@ -76,11 +67,25 @@ int main(int argc, char** argv)
 	//cout << CategoryDAO::GetCategoryByID(1).name.toAnsiString() << endl;
 	//cout << WordDAO::InsertWord(1, Word("MyWord", "MyHint")) << endl;
 
-	String sfmlString(StringUtils::U8toSFML(u8"国語辞典Ñoñosä"));
-	cout << StringUtils::SFMLtoU8(sfmlString) << endl;
+	//TDictionaryPtr dictionary = DictionaryDAO::GetDictionaryByID(1);
 
-	TDictionaryPtr dictionary = DictionaryDAO::GetDictionaryByID(1);
+	auto dictionaries = DictionaryDAO::GetAllDictionaries();
+	for (auto& dictionary : dictionaries)
+		dictionary->PrintDebug();
+	cout << "**************************" << endl;
 
+	auto categories = CategoryDAO::GetCategoriesByDictionaryID(1);
+	for (auto& category : categories)
+		category.PrintDebug();
+	cout << "**************************" << endl;
+
+	auto words = WordDAO::GetWordsByCategoryID(1);
+	for (auto& word : words)
+		word.PrintDebug();
+	cout << "**************************" << endl;
+
+	return 0;
+/*
 	bool nextWord = false;
 
 	WordViewer wViewer(500, 50, dictionary->GetFont(), txUnderline);
@@ -151,6 +156,6 @@ int main(int argc, char** argv)
 		ex.Show();
 		return 1;
 	}
-
+*/
 	return 0;
 }

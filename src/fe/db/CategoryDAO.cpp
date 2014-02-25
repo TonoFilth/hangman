@@ -1,8 +1,6 @@
 #include "fe/db/CategoryDAO.h"
 
 using namespace std;
-using namespace sf;
-using namespace Kompex;
 
 namespace fe
 {
@@ -21,12 +19,12 @@ TCategoryID CategoryDAO::InsertCategory(const TDictionaryID dictionaryID,
 	return m_DAO->InsertCategory(dictionaryID, name);
 }
 
-TCategory CategoryDAO::GetCategoryByID(const TCategoryID id)
+Category CategoryDAO::GetCategoryByID(const TCategoryID id)
 {
 	return m_DAO->GetCategoryByID(id);
 }
 
-TCategoryList CategoryDAO::GetCategoriesByDictionaryID(const TDictionaryID id)
+TCategoryVec CategoryDAO::GetCategoriesByDictionaryID(const TDictionaryID id)
 {
 	return m_DAO->GetCategoriesByDictionaryID(id);
 }

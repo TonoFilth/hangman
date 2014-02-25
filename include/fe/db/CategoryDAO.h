@@ -2,6 +2,7 @@
 #define __CATEGORY_DAO_H__
 
 #include "fe/db/DictionaryDAO.h"
+#include "fe/words/Category.h"
 
 namespace fe
 {
@@ -22,8 +23,8 @@ public:
 
 	virtual TCategoryID InsertCategory(const TDictionaryID dictionaryID,
 									   const std::string& name) = 0;
-	virtual TCategory GetCategoryByID(const TCategoryID id) = 0;
-	virtual TCategoryList GetCategoriesByDictionaryID(const TDictionaryID id) = 0;
+	virtual Category GetCategoryByID(const TCategoryID id) = 0;
+	virtual TCategoryVec GetCategoriesByDictionaryID(const TDictionaryID id) = 0;
 
 	virtual bool Exists(const TCategoryID id) = 0;
 	virtual bool Exists(const std::string& name) = 0;
@@ -42,9 +43,9 @@ public:
 	virtual ~CategoryDAO() {}
 
 	static TCategoryID InsertCategory(const TDictionaryID dictionaryID,
-									   const std::string& name);
-	static TCategory GetCategoryByID(const TCategoryID id);
-	static TCategoryList GetCategoriesByDictionaryID(const TDictionaryID id);
+									  const std::string& name);
+	static Category GetCategoryByID(const TCategoryID id);
+	static TCategoryVec GetCategoriesByDictionaryID(const TDictionaryID id);
 
 	static bool Exists(const TCategoryID id);
 	static bool Exists(const std::string& name);

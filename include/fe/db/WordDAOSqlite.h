@@ -12,6 +12,10 @@ class WordDAOSqlite : public IWordDAO
 private:
 	TDatabasePtr m_Database;
 
+	Word CreateWord(const TWordID id,
+					const std::string& str,
+					const std::string& hint);
+
 	WordDAOSqlite(const WordDAOSqlite& toCopy);
 	WordDAOSqlite& operator=(const WordDAOSqlite& toCopy);
 

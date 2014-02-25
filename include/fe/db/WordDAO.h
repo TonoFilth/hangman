@@ -2,6 +2,7 @@
 #define __WORD_DAO_H__
 
 #include "fe/db/CategoryDAO.h"
+#include "fe/words/Word.h"
 
 namespace fe
 {

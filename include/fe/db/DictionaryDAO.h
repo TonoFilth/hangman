@@ -29,7 +29,7 @@ public:
 										   const std::string& characterSet,
 								   		   const std::string& fontFile) = 0;
 	virtual TDictionaryPtr GetDictionaryByID(const TDictionaryID id) = 0;
-	virtual TDictionaryList GetAllDictionaries() = 0;
+	virtual TDictionaryVec GetAllDictionaries() = 0;
 
 	virtual bool Exists(const TDictionaryID id) = 0;
 	virtual bool Exists(const std::string& name) = 0;
@@ -52,7 +52,7 @@ public:
 										  const std::string& characterSet,
 										  const std::string& fontFile);
 	static TDictionaryPtr GetDictionaryByID(const TDictionaryID id);
-	static TDictionaryList GetAllDictionaries();
+	static TDictionaryVec GetAllDictionaries();
 
 	static bool Exists(const TDictionaryID id);
 	static bool Exists(const std::string& name);
