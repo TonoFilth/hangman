@@ -10,23 +10,16 @@ namespace fe
 {
 
 class Word;
-class WordDAOSqlite;
 
-typedef UI32			  TWordID;
 typedef std::vector<Word> TWordVec;
 
 extern const std::string DEF_WORD_STRING;
 extern const std::string DEF_WORD_HINT;
-extern const TWordID ERR_WORD_ID;
-extern const Word InvalidWord;
+extern const Word 		 InvalidWord;
 
 class Word
 {
 private:
-	friend class WordDAOSqlite;
-	static TWordID WORD_ID;
-
-	TWordID	 	m_ID;
 	std::string m_String;
 	std::string m_Hint;
 
@@ -38,10 +31,9 @@ public:
 	Word& operator=(const Word& toCopy);
 	virtual ~Word();
 
-	friend bool operator==(const Word& wordA, const Word& wordB);
-	friend bool operator!=(const Word& wordA, const Word& wordB);
+	friend bool operator==(const Word& A, const Word& B);
+	friend bool operator!=(const Word& A, const Word& B);
 
-	TWordID GetID() const;
 	const std::string& GetString() const;
 	const std::string& GetHint() const;
 
@@ -53,8 +45,8 @@ public:
 	void PrintDebug(const std::string& spaces = "") const;
 };
 
-bool operator==(const Word& wordA, const Word& wordB);
-bool operator!=(const Word& wordA, const Word& wordB);
+bool operator==(const Word& A, const Word& B);
+bool operator!=(const Word& A, const Word& B);
 
 }
 

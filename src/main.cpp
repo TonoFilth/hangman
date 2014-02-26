@@ -6,9 +6,9 @@
 #include "fe/ui/WordViewer.h"
 #include "fe/words/Dictionary.h"
 
-#include "fe/db/WordDAOSqlite.h"
-#include "fe/db/CategoryDAOSqlite.h"
-#include "fe/db/DictionaryDAOSqlite.h"
+//#include "fe/db/WordDAOSqlite.h"
+//#include "fe/db/CategoryDAOSqlite.h"
+//#include "fe/db/DictionaryDAOSqlite.h"
 
 using namespace std;
 using namespace sf;
@@ -17,6 +17,7 @@ using namespace fe;
 
 int main(int argc, char** argv)
 {
+	/*
 	TBodyBuilderPtr       bBuilder    = make_shared<OrderedBodyBuilder>();
 	TBodyPartExtractorPtr bpExtractor = make_shared<JsonBodyPartExtractor>("assets/json/default-body.json");
 
@@ -84,12 +85,24 @@ int main(int argc, char** argv)
 		word.PrintDebug();
 	cout << "**************************" << endl;
 
+	auto d = DictionaryDAO::GetDictionaryByID(4);
+	
+	if (d != nullptr)
+		DictionaryDAO::Delete(*d);
+	else
+		cout << "NULL" << endl;
+
+	InvalidWord.PrintDebug();
+	InvalidCategory.PrintDebug();
+	InvalidDictionary.PrintDebug();
+
 	return 0;
-/*
+
+	TDictionaryPtr dictionary = dictionaries.front();
 	bool nextWord = false;
 
 	WordViewer wViewer(500, 50, dictionary->GetFont(), txUnderline);
-	wViewer.SetWord(Word(dictionary->GetWord()));
+	wViewer.SetWord(Word(categories.front().GetRandomWord()));
 
 	LetterPicker picker(500, 100, 10, dictionary->GetFont());
 	picker.SetPosition(Vector2f(0, 400));
@@ -127,7 +140,7 @@ int main(int argc, char** argv)
 				
 				if (nextWord)
 				{
-					wViewer.SetWord(dictionary->GetWord(1).GetWord());
+					wViewer.SetWord(categories.front().GetRandomWord());
 					picker.SetLetterColor(Color::White);
 					hangman->HideAllBodyParts();
 					nextWord = false;
@@ -156,6 +169,7 @@ int main(int argc, char** argv)
 		ex.Show();
 		return 1;
 	}
-*/
+	*/
+
 	return 0;
 }

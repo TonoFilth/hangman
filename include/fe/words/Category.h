@@ -12,49 +12,48 @@ namespace fe
 {
 
 class Category;
-class CategoryDAOSqlite;
 
-typedef UI32 							TCategoryID;
 typedef std::vector<Category>			TCategoryVec;
-typedef std::map<TCategoryID, Category> TCategoryMap;
+typedef std::map<std::string, Category> TCategoryMap;
+typedef std::vector<UI32>				TRandomIndexVec;
 
 extern const std::string DEF_CATEGORY_NAME;
-extern const TCategoryID ERR_CATEGORY_ID;
-extern const Category InvalidCategory;
+extern const Category 	 InvalidCategory;
 
 class Category
 {
 private:
-	friend class CategoryDAOSqlite;
-	static TCategoryID CATEGORY_ID;
-
-	TCategoryID m_ID;
-	std::string m_Name;
-	TWordVec	m_Words;
+	std::string 	m_Name;
+	TWordVec		m_Words;
+	TRandomIndexVec m_RandomVec;
 
 	void Copy(const Category& toCopy);
+	void GenerateRandomVector();
+	UI32 GetNextRandomIndex();
 
 public:
-	Category(const std::string& name = DEF_CATEGORY_NAME);
-	Category(const std::string& name, const TWordVec& words);
+	Category(const std::string& name = DEF_CATEGORY_NAME, const TWordVec& words = TWordVec());
 	Category(const Category& toCopy);
 	Category& operator=(const Category& toCopy);
 	virtual ~Category();
 
-	void AddWord(const Word& word);
-	void AddWords(const TWordVec& words);
+	friend bool operator==(const Category& A, const Category& B);
+	friend bool operator!=(const Category& A, const Category& B);
 
-	void RemoveWord(const TWordID& id);
-	void RemoveWord(const Word& word);
-	void RemoveWords(const TWordVec& words);
+	bool AddWord(const Word& word);
+	bool AddWords(const TWordVec& words);
 
-	TCategoryID GetID() const;
+	bool RemoveWord(const Word& word);
+	bool RemoveWords(const TWordVec& words);
+
+	void Clear();
+
 	std::string GetName() const;
-	Word GetWord(const TWordID& id) const;
-	Word GetRandomWord() const;
-	UI32 GetWordCount() const;
-
 	void SetName(const std::string& name);
+
+	const TWordVec& GetWords() const;
+	Word GetRandomWord();
+	UI32 GetWordCount() const;
 
 	bool IsEmpty() const;
 	bool IsValid() const;
@@ -62,6 +61,9 @@ public:
 
 	void PrintDebug(const std::string& spaces = "") const;
 };
+
+bool operator==(const Category& A, const Category& B);
+bool operator!=(const Category& A, const Category& B);
 
 }
 

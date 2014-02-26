@@ -8,29 +8,31 @@ namespace fe
 // =============================================================================
 //	CONSTANTS
 // =============================================================================
-const string DEF_CATEGORY_NAME("Unnamed Category");
-const TCategoryID ERR_CATEGORY_ID(0);
+const string   DEF_CATEGORY_NAME("Unnamed Category");
 const Category InvalidCategory("73067B27-E101-43AF-8492-95B7F92B8D2E");
 
 // =============================================================================
-//	STATIC FIELDS
+//	NON-MEMBER FUNCTIONS
 // =============================================================================
-TCategoryID Category::CATEGORY_ID = 0;
+bool operator==(const Category& A, const Category& B)
+{
+	return A.m_Name == B.m_Name;
+}
+
+bool operator!=(const Category& A, const Category& B)
+{
+	return A.m_Name != B.m_Name;
+}
 
 // =============================================================================
 //	CONSTRUCTORS, COPY CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT OPERATOR
 // =============================================================================
-Category::Category(const string& name) :
-	Category(name, TWordVec())
-{
-}
-
-Category::Category(const string& name, const TWordVec& words) :
-	m_ID(CATEGORY_ID++),
-	m_Name(name),
-	m_Words(words)
+Category::Category(const string& name,
+				   const TWordVec& words) :
+	m_Name(name)
 {
 	srand(time(0));
+	AddWords(words);
 }
 
 Category::Category(const Category& toCopy)
@@ -56,91 +58,94 @@ Category::~Category()
 // =============================================================================
 void Category::Copy(const Category& toCopy)
 {
-	//m_ID    = CATEGORY_ID++;
-	m_ID	= toCopy.m_ID;
-	m_Name  = toCopy.m_Name;
-	m_Words = toCopy.m_Words;
+	m_Name  	= toCopy.m_Name;
+	m_Words 	= toCopy.m_Words;
+	m_RandomVec = toCopy.m_RandomVec;
+
+	GenerateRandomVector();
+}
+
+void Category::GenerateRandomVector()
+{
+	m_RandomVec.clear();
+	
+	for (UI32 i = 0; i < m_Words.size(); ++i)
+		m_RandomVec.push_back(i);
+
+	random_shuffle(m_RandomVec.begin(), m_RandomVec.end());
+}
+
+UI32 Category::GetNextRandomIndex()
+{
+	if (m_RandomVec.empty())
+		GenerateRandomVector();
+
+	UI32 idx = m_RandomVec.front();
+	m_RandomVec.erase(m_RandomVec.begin());
+	return idx;
 }
 
 // =============================================================================
 //	REGULAR METHODS
 // =============================================================================
-void Category::AddWord(const Word& word)
+bool Category::AddWord(const Word& word)
 {
-	if (ContainsWord(word))
-		return;
+	if (!word.IsValid() || ContainsWord(word))
+		return false;
 
 	m_Words.push_back(word);
+	return true;
 }
 
-void Category::AddWords(const TWordVec& words)
+bool Category::AddWords(const TWordVec& words)
 {
+	bool allok = true;
 	for (auto& word : words)
-		AddWord(word);
+		if (!AddWord(word))
+			allok = false;
+	return allok;
 }
 
-void Category::RemoveWord(const TWordID& id)
+bool Category::RemoveWord(const Word& word)
 {
-	auto word = GetWord(id);
-
-	if (!word.IsValid())
-		return;
-
-	RemoveWord(word);
-}
-
-void Category::RemoveWord(const Word& word)
-{
-	auto it = m_Words.begin();
-
+	auto it = m_Words.end();
 	if ((it = find(m_Words.begin(), m_Words.end(), word)) == m_Words.end())
-		return;
-
+		return false;
 	m_Words.erase(it);
+	return true;
 }
 
-void Category::RemoveWords(const TWordVec& words)
+bool Category::RemoveWords(const TWordVec& words)
 {
-	auto it = m_Words.begin();
+	bool allok = true;
+	for (auto& word : words)
+		if (!RemoveWord(word))
+			allok = false;
+	return allok;
+}
 
-	while (it != m_Words.end())
-		if ((it = find_first_of(m_Words.begin(), m_Words.end(), words.begin(), words.end())) != m_Words.end())
-			m_Words.erase(it);
+void Category::Clear()
+{
+	m_Words.clear();
 }
 
 // =============================================================================
 //	GETTERS & SETTERS
 // =============================================================================
-TCategoryID Category::GetID() const
+string Category::GetName() const 			 { return m_Name; }
+void   Category::SetName(const string& name) { m_Name = name; }
+
+const TWordVec& Category::GetWords() const
 {
-	return m_ID;
+	return m_Words;
 }
 
-string Category::GetName() const
-{
-	return m_Name;
-}
-
-Word Category::GetWord(const TWordID& id) const
-{
-	auto it = m_Words.begin();
-
-	if ((it = find_if(m_Words.begin(), m_Words.end(),
-		[id] (const Word& w) { return w.GetID() == id; })) == m_Words.end())
-		return InvalidWord;
-
-	return *it;
-}
-
-Word Category::GetRandomWord() const
+Word Category::GetRandomWord()
 {
 	if (IsEmpty())
 		return InvalidWord;
 
-	UI32 range = m_Words.size() - 1;
-	UI32 index = UI32((range * rand()) / (RAND_MAX + 1.0));
-
-	return m_Words[index];
+	return m_Words[GetNextRandomIndex()];
 }
 
 UI32 Category::GetWordCount() const
@@ -148,28 +153,22 @@ UI32 Category::GetWordCount() const
 	return m_Words.size();
 }
 
-void Category::SetName(const string& name)
-{
-	m_Name = name;
-}
-
 // =============================================================================
 //	QUESTION METHODS
 // =============================================================================
-bool Category::ContainsWord(const Word& word) const
-{
-	return (find(m_Words.begin(), m_Words.end(), word) != m_Words.end());
-}
-
 bool Category::IsValid() const
 {
-	return m_ID   != ERR_CATEGORY_ID ||
-		   m_Name != InvalidCategory.m_Name;
+	return m_Name != InvalidCategory.m_Name;
 }
 
 bool Category::IsEmpty() const
 {
 	return m_Words.empty();
+}
+
+bool Category::ContainsWord(const Word& word) const
+{
+	return find(m_Words.begin(), m_Words.end(), word) != m_Words.end();
 }
 
 // =============================================================================
@@ -178,15 +177,14 @@ bool Category::IsEmpty() const
 void Category::PrintDebug(const string& spaces) const
 {
 	cout << spaces << "CATEGORY" << endl;
-	cout << spaces << "  ID:         " << m_ID << endl;
 	cout << spaces << "  Name:       \"" << m_Name << "\"" << endl;
 	cout << spaces << "  Word Count: " << GetWordCount() << endl;
 	cout << spaces << "  Words:" << endl;
 
 	for (auto& word : m_Words)
 	{
-		word.PrintDebug(spaces + "  ");
-		cout << spaces << "  --" << endl;
+		word.PrintDebug(spaces + "    ");
+		cout << spaces << "    --" << endl;
 	}
 }
 

@@ -2,7 +2,7 @@
 bin/
 lib/
 .obj/
-.obj_tests/
+.obj_test/
 doc/*
 trash/
 
