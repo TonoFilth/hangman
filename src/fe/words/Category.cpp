@@ -127,6 +127,7 @@ bool Category::RemoveWords(const TWordVec& words)
 void Category::Clear()
 {
 	m_Words.clear();
+	m_RandomVec.clear();
 }
 
 // =============================================================================

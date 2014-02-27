@@ -47,6 +47,8 @@ public:
 	bool RemoveCategory(const Category& category);
 	bool RemoveCategories(const TCategoryVec& categories);
 
+	void Clear();
+
 	std::string GetName() 		  const;
 	std::string GetLanguage() 	  const;
 	std::string GetCharacterSet() const;
@@ -63,7 +65,9 @@ public:
 	bool IsEmpty() const;
 	bool IsValid() const;
 	bool ContainsWord(const Word& word) const;
+	bool ContainsAllWords(const TWordVec& word) const;
 	bool ContainsCategory(const Category& categoryName) const;
+	bool ContainsAllCategories(const TCategoryVec& categories) const;
 
 	void PrintDebug(const std::string& spaces = "") const;
 };

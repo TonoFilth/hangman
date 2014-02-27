@@ -11,12 +11,14 @@
 
 #include "WordTest.h"
 #include "CategoryTest.h"
+#include "DictionaryTest.h"
 
 using namespace fe;
 using namespace CppUnit;
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WordTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(CategoryTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(DictionaryTest);
 
 int main(int argc, char** argv)
 {

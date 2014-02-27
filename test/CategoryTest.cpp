@@ -221,6 +221,13 @@ void CategoryTest::TestRandomWord()
 	returned.push_back(w);
 	w = m_DefaultCategory.GetRandomWord();
 	CPPUNIT_ASSERT(find(returned.begin(), returned.end(), w) != returned.end());
+	CPPUNIT_ASSERT(w != InvalidWord);
+
+	// Clear the category and try to retrieve
+	// a random word to see if the class has
+	// cleared the random index vector
+	m_DefaultCategory.Clear();
+	CPPUNIT_ASSERT(m_DefaultCategory.GetRandomWord() == InvalidWord);
 }
 
 void CategoryTest::TestWordCount()

@@ -40,42 +40,66 @@ Dictionary::~Dictionary()
 // =============================================================================
 bool Dictionary::AddWord(const Word& word, const Category& category)
 {
-	return false;
+	if (!ContainsCategory(category))
+		return false;
+	return m_CategoryMap[category.GetName()].AddWord(word);
 }
 
 bool Dictionary::AddWords(const TWordVec& words, const Category& category)
 {
-	return false;
+	if (!ContainsCategory(category))
+		return false;
+	return m_CategoryMap[category.GetName()].AddWords(words);
 }
 
 bool Dictionary::RemoveWord(const Word& word)
 {
-	return false;
+	bool some = false;
+	for_each(m_CategoryMap.begin(), m_CategoryMap.end(),
+			 [&some, &word] (pair<const string, Category>& kv)
+			 {
+			 	if (kv.second.RemoveWord(word))
+			 		some = true;
+			 });
+	return some;
 }
 
 bool Dictionary::RemoveWords(const TWordVec& words)
 {
-	return false;
+	return all_of(words.begin(), words.end(),
+				  [&] (const Word& w) { return RemoveWord(w); } );
 }
 
 bool Dictionary::AddCategory(const Category& category)
 {
-	return false;
+	if (!category.IsValid() || ContainsCategory(category))
+		return false;
+	m_CategoryMap[category.GetName()] = category;
+	return true;
 }
 
 bool Dictionary::AddCategories(const TCategoryVec& categories)
 {
-	return false;
+	return all_of(categories.begin(), categories.end(),
+				  [&] (const Category& c) { return AddCategory(c); } );
 }
 
 bool Dictionary::RemoveCategory(const Category& category)
 {
-	return false;
+	if (!ContainsCategory(category))
+		return false;
+	return m_CategoryMap.erase(category.GetName()) == 1;
 }
 
 bool Dictionary::RemoveCategories(const TCategoryVec& categories)
 {
-	return false;
+	return all_of(categories.begin(), categories.end(),
+				  [&] (const Category& c) { return RemoveCategory(c); } );
+}
+
+void Dictionary::Clear()
+{
+	m_CategoryMap.clear();
 }
 
 // =============================================================================
@@ -93,7 +117,10 @@ void Dictionary::SetFont(const string& font)		 { m_Font = font; 		  }
 
 UI32 Dictionary::GetWordCount() const
 {
-	return 0;
+	UI32 wc = 0;
+	for_each(m_CategoryMap.begin(), m_CategoryMap.end(),
+			 [&wc] (pair<const string, Category> kv) { wc += kv.second.GetWordCount(); });
+	return wc;
 }
 
 UI32 Dictionary::GetCategoryCount() const { return m_CategoryMap.size(); }
@@ -113,12 +140,26 @@ bool Dictionary::IsValid() const
 
 bool Dictionary::ContainsWord(const Word& word) const
 {
-	return false;
+	return any_of(m_CategoryMap.begin(), m_CategoryMap.end(),
+				  [&word] (const pair<const string, const Category>& kv)
+				  { return kv.second.ContainsWord(word); });
+}
+
+bool Dictionary::ContainsAllWords(const TWordVec& words) const
+{
+	return all_of(words.begin(), words.end(),
+				  [&] (const Word& w) { return ContainsWord(w); });
 }
 
 bool Dictionary::ContainsCategory(const Category& category) const
 {
-	return false;
+	return m_CategoryMap.count(category.GetName()) == 1;
+}
+
+bool Dictionary::ContainsAllCategories(const TCategoryVec& categories) const
+{
+	return all_of(categories.begin(), categories.end(),
+				  [&] (const Category& c) { return ContainsCategory(c); });
 }
 
 // =============================================================================

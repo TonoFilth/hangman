@@ -4,7 +4,7 @@ lib/
 .obj/
 .obj_test/
 doc/*
-trash/
+.trash/
 
 # FILES
 a.out
