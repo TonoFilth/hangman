@@ -29,10 +29,57 @@ Dictionary::Dictionary(const string& name,
 	m_CharacterSet(cset),
 	m_Font(font)
 {
+	srand(time(0));
+}
+
+Dictionary::Dictionary(const Dictionary& toCopy)
+{
+	Copy(toCopy);
+}
+
+Dictionary& Dictionary::operator=(const Dictionary& toCopy)
+{
+	if (this == &toCopy)
+		return *this;
+
+	Copy(toCopy);
+	return *this;
 }
 
 Dictionary::~Dictionary()
 {
+}
+
+// =============================================================================
+//	PRIVATE AND PROTECTED METHODS
+// =============================================================================
+void Dictionary::Copy(const Dictionary& toCopy)
+{
+	m_Name 		   = toCopy.m_Name;
+	m_Lang 		   = toCopy.m_Lang;
+	m_CharacterSet = toCopy.m_CharacterSet;
+	m_Font 		   = toCopy.m_Font;
+	m_CategoryMap  = toCopy.m_CategoryMap;
+}
+
+void Dictionary::GenerateRandomStringVector()
+{
+	m_RandomStringVec.clear();
+
+	for (auto& kv : m_CategoryMap)
+		m_RandomStringVec.push_back(kv.first);
+
+	random_shuffle(m_RandomStringVec.begin(), m_RandomStringVec.end());
+}
+
+string Dictionary::GetNextRandomString()
+{
+	if (m_RandomStringVec.empty())
+		GenerateRandomStringVector();
+
+	string str = m_RandomStringVec.front();
+	m_RandomStringVec.erase(m_RandomStringVec.begin());
+	return str;
 }
 
 // =============================================================================
@@ -114,6 +161,19 @@ void Dictionary::SetName(const string& name)	  	 { m_Name = name; 		  }
 void Dictionary::SetLanguage(const string& lang)  	 { m_Lang = lang;  		  }
 void Dictionary::SetCharacterSet(const string& cset) { m_CharacterSet = cset; }
 void Dictionary::SetFont(const string& font)		 { m_Font = font; 		  }
+
+Word Dictionary::GetRandomWord()
+{
+	if (IsEmpty())
+		return InvalidWord;
+
+	return m_CategoryMap[GetNextRandomString()].GetRandomWord();
+}
+
+Word Dictionary::GetRandomWordFromCategory(const string& categoryName)
+{
+	return m_CategoryMap[categoryName].GetRandomWord();
+}
 
 UI32 Dictionary::GetWordCount() const
 {

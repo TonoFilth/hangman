@@ -81,7 +81,6 @@ check-test:
 	@echo "Checking test dirs ..."
 	@test -d $(TESTDIR) || { echo "The directory '$(TESTDIR)' doesn't exists. No tests to run."; exit 1; }
 	@test -d $(TMPTESTDIR) || mkdir $(TMPTESTDIR)
-	@$(shell find $(TESTSRCDIR) -depth -type d -print | cpio -pd $(TMPTESTDIR))
 
 $(TMPTESTDIR)/%.o: %.cpp
 	@echo "------------------------"

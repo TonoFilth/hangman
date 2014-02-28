@@ -11,6 +11,7 @@ class Dictionary;
 
 typedef std::shared_ptr<Dictionary> TDictionaryPtr;
 typedef std::vector<TDictionaryPtr>	TDictionaryVec;
+typedef std::vector<std::string>	TRandomStringVec;
 
 extern const std::string DEF_DICTIONARY_NAME;
 extern const std::string DEF_DICTIONARY_LANG;
@@ -25,16 +26,21 @@ private:
 	std::string   m_Lang;
 	std::string   m_CharacterSet;
 	std::string   m_Font;
-	TCategoryMap  m_CategoryMap;
 
-	Dictionary(const Dictionary& toCopy);
-	Dictionary& operator=(const Dictionary& toCopy);
+	TCategoryMap     m_CategoryMap;
+	TRandomStringVec m_RandomStringVec;
+
+	void Copy(const Dictionary& toCopy);
+	void GenerateRandomStringVector();
+	std::string GetNextRandomString();
 
 public:
 	Dictionary(const std::string& name = DEF_DICTIONARY_NAME,
 			   const std::string& lang = DEF_DICTIONARY_LANG,
 			   const std::string& cset = DEF_DICTIONARY_CHARACTER_SET,
 			   const std::string& font = DEF_DICTIONARY_FONT);
+	Dictionary(const Dictionary& toCopy);
+	Dictionary& operator=(const Dictionary& toCopy);
 	virtual ~Dictionary();
 
 	bool AddWord(const Word& word, const Category& category);
@@ -58,6 +64,9 @@ public:
 	void SetLanguage(const std::string& lang);
 	void SetCharacterSet(const std::string& cset);
 	void SetFont(const std::string& font);
+
+	Word GetRandomWord();
+	Word GetRandomWordFromCategory(const std::string& categoryName);
 
 	UI32 GetWordCount() const;
 	UI32 GetCategoryCount() const;

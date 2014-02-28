@@ -9,6 +9,13 @@
 //#include "fe/db/WordDAOSqlite.h"
 //#include "fe/db/CategoryDAOSqlite.h"
 //#include "fe/db/DictionaryDAOSqlite.h"
+#include "Kompex/KompexSQLiteDatabase.h"
+#include "Kompex/KompexSQLiteStatement.h"
+#include "Kompex/KompexSQLiteException.h"
+
+#include "fe/db/WordDAOSqlite.h"
+#include "fe/db/CategoryDAOSqlite.h"
+#include "fe/db/DictionaryDAOSqlite.h"
 
 using namespace std;
 using namespace sf;
@@ -17,7 +24,24 @@ using namespace fe;
 
 int main(int argc, char** argv)
 {
-	/*
+	TDatabasePtr db = make_shared<SQLiteDatabase>("hangman.sqlite", SQLITE_OPEN_READWRITE, nullptr);
+
+	TWordDAOPtr 	  wordDAO 		= make_shared<WordDAOSqlite>(db);
+	TCategoryDAOPtr   categoryDAO   = make_shared<CategoryDAOSqlite>(db);
+	TDictionaryDAOPtr dictionaryDAO = make_shared<DictionaryDAOSqlite>(db);
+
+	MasterDAO::Words 		= wordDAO;
+	MasterDAO::Categories   = categoryDAO;
+	MasterDAO::Dictionaries = dictionaryDAO;
+
+	auto dictionary = MasterDAO::Dictionaries->GetByID(1);
+
+	if (!dictionary.IsValid())
+	{
+		cerr << "Invalid dictionary" << endl;
+		return 1;
+	}
+
 	TBodyBuilderPtr       bBuilder    = make_shared<OrderedBodyBuilder>();
 	TBodyPartExtractorPtr bpExtractor = make_shared<JsonBodyPartExtractor>("assets/json/default-body.json");
 
@@ -40,73 +64,21 @@ int main(int argc, char** argv)
 	TTexturePtr txUnderline = make_shared<Texture>();
 	txUnderline->loadFromFile("assets/images/underline.png");
 
-	TFontPtr exoFont    = make_shared<Font>(),
-			 osakaFont  = make_shared<Font>(),
-			 monacoFont = make_shared<Font>();
-
-	exoFont->loadFromFile("assets/fonts/Exo-Black.otf");
-	osakaFont->loadFromFile("assets/fonts/osaka.unicode.ttf");
-	monacoFont->loadFromFile("assets/fonts/Monaco.ttf");
-
-	TDatabasePtr database = make_shared<SQLiteDatabase>("hangman.sqlite", SQLITE_OPEN_READWRITE, nullptr);
-
-	TIDictionaryDAOPtr dictionaryDAO = make_shared<DictionaryDAOSqlite>(database);
-	TICategoryDAOPtr   categoryDAO 	 = make_shared<CategoryDAOSqlite>(database);
-	TIWordDAOPtr 	   wordDAO 		 = make_shared<WordDAOSqlite>(database);
-
-	DictionaryDAO::SetDAO(dictionaryDAO);
-	CategoryDAO::SetDAO(categoryDAO);
-	WordDAO::SetDAO(wordDAO);
-
-	//cout << DictionaryDAO::InsertDictionary("English dictionary", "en-EN", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "assets/fonts/Exo-Black.otf") << endl;
-	//cout << DictionaryDAO::InsertDictionary("Diccionario español", "es-ES", "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", "assets/fonts/Monaco.ttf") << endl;
-	//cout << DictionaryDAO::InsertDictionary("国語辞典", "jp-JP", "んわらやまはなたさかあっゐりみひにちしきい゛るゆむふぬつすくうーゑれめへねてせけえヶをろよもほのとそこお", "assets/fonts/osaka.unicode.ttf") << endl;
-	//cout << DictionaryDAO::GetAllDictionaries().size() << endl;
-	//cout << CategoryDAO::InsertCategory(1, "English category 1") << endl;
-	//cout << CategoryDAO::InsertCategory(1, "Categoría española 1") << endl;
-	//cout << CategoryDAO::InsertCategory(1, "日本カテゴリ1") << endl;
-	//cout << CategoryDAO::GetCategoryByID(1).name.toAnsiString() << endl;
-	//cout << WordDAO::InsertWord(1, Word("MyWord", "MyHint")) << endl;
-
-	//TDictionaryPtr dictionary = DictionaryDAO::GetDictionaryByID(1);
-
-	auto dictionaries = DictionaryDAO::GetAllDictionaries();
-	for (auto& dictionary : dictionaries)
-		dictionary->PrintDebug();
-	cout << "**************************" << endl;
-
-	auto categories = CategoryDAO::GetCategoriesByDictionaryID(1);
-	for (auto& category : categories)
-		category.PrintDebug();
-	cout << "**************************" << endl;
-
-	auto words = WordDAO::GetWordsByCategoryID(1);
-	for (auto& word : words)
-		word.PrintDebug();
-	cout << "**************************" << endl;
-
-	auto d = DictionaryDAO::GetDictionaryByID(4);
-	
-	if (d != nullptr)
-		DictionaryDAO::Delete(*d);
-	else
-		cout << "NULL" << endl;
-
-	InvalidWord.PrintDebug();
-	InvalidCategory.PrintDebug();
-	InvalidDictionary.PrintDebug();
-
-	return 0;
-
-	TDictionaryPtr dictionary = dictionaries.front();
 	bool nextWord = false;
 
-	WordViewer wViewer(500, 50, dictionary->GetFont(), txUnderline);
-	wViewer.SetWord(Word(categories.front().GetRandomWord()));
+	TFontPtr dictionaryFont = make_shared<Font>();
+	if (!dictionaryFont->loadFromFile(dictionary.GetFont()))
+	{
+		cerr << "Can't load dictionary's font: " << dictionary.GetFont() << endl;
+		return 1;
+	}
 
-	LetterPicker picker(500, 100, 10, dictionary->GetFont());
+	WordViewer wViewer(500, 50, dictionaryFont, txUnderline);
+	wViewer.SetWord(Word(dictionary.GetRandomWord()));
+
+	LetterPicker picker(500, 100, 10, dictionaryFont);
 	picker.SetPosition(Vector2f(0, 400));
-	picker.SetLetters(dictionary->GetCharacterSet());
+	picker.SetLetters(dictionary.GetCharacterSet());
 	picker.SetLetterCallback([&wViewer, &hangman](LetterButton* b, const string& c)
 	{
 		// ******* IF PLAYER CLICKS TWO TIMES THE SAME LETTER
@@ -140,7 +112,7 @@ int main(int argc, char** argv)
 				
 				if (nextWord)
 				{
-					wViewer.SetWord(categories.front().GetRandomWord());
+					wViewer.SetWord(dictionary.GetRandomWord());
 					picker.SetLetterColor(Color::White);
 					hangman->HideAllBodyParts();
 					nextWord = false;
@@ -161,15 +133,13 @@ int main(int argc, char** argv)
 
 	try
 	{
-		database->ReleaseMemory();
-		database->Close();
+		db->ReleaseMemory();
+		db->Close();
 	}
-	catch (SQLiteException& ex)
+	catch (const SQLiteException& ex)
 	{
 		ex.Show();
-		return 1;
 	}
-	*/
 
 	return 0;
 }
