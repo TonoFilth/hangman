@@ -1,0 +1,6 @@
+"Dictionary 1" en-EN ABCDEFGHIJKLMNOPQRSTUVWXYZ font.ttf
+"Dictionary 2" es-ES ABCDEFGHIJKLMNÑOPQRSTUVWXYZ spanish-font.ttf
+reject me
+adfadsfadsfasdf
+kdkdkddkdk
+

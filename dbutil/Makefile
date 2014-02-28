@@ -3,7 +3,7 @@ CC:=g++
 CFLAGS:=-Wall -ggdb -std=c++11
 
 # APP
-APPNAME:=file2db
+APPNAME:=dbutil
 
 # APP DIRECTORIES
 BUILDDIR:=bin
@@ -13,7 +13,7 @@ SRCDIR:=../src
 TMPDIR:=../.obj
 
 # SOURCES
-MAINFILE=file2db.cpp
+MAINFILE=dbutil.cpp
 SOURCES:=$(shell find $(SRCDIR) -name '*.cpp')
 SOURCES:=$(subst $(SRCDIR)/main.cpp,,$(SOURCES))
 
@@ -46,10 +46,5 @@ all: check $(MAINFILE)
 
 check:
 	@test -d $(BUILDDIR) || mkdir $(BUILDDIR)
-
-# =================================== OTHER ====================================
-clean:
-	-rm -Rf $(TMPDIR)
-	-rm -Rf $(TMPTESTDIR)
 
 .PHONY: clean all

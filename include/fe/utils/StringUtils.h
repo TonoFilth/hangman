@@ -47,6 +47,8 @@ public:
 	static void FindAndReplace(std::string& str, const std::string& find, const std::string& replace);
 	static void FindAnyAndReplace(std::string& str, const std::string& find, const std::string& replace);
 	static void Translate(std::string& str, const TStringVec& charsToTranslate, const TStringVec& translatedChars);
+	static TStringVec Explode(const std::string& str, const std::string& delimiter);
+	static TStringVec ExplodeOmitQuotes(const std::string& str, const std::string& delimiter);
 };
 
 }

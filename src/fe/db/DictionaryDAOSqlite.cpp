@@ -139,6 +139,33 @@ QDictionary DictionaryDAOSqlite::GetByID(const TDictionaryID dicID)
 	return qd;
 }
 
+QDictionary DictionaryDAOSqlite::GetByName(const string& name)
+{
+	if (!Exists(name))
+		return InvalidQDictionary;
+
+	QDictionary qd(InvalidQDictionary);
+
+	if (!m_Base.DoSQL([&name, &qd, this] (SQLiteStatement s)
+	{
+		s.Sql("SELECT * FROM Dictionaries WHERE name=@name");
+		s.BindString(1, name);
+
+		if (!s.FetchRow())
+			return false;
+
+		qd = CreateQDictionary(s.GetColumnInt(0),
+							   s.GetColumnString(1),
+							   s.GetColumnString(2),
+							   s.GetColumnString(3),
+							   s.GetColumnString(4));
+		return true;
+	}))
+		return InvalidQDictionary;
+
+	return qd;
+}
+
 TQDictionaryVec DictionaryDAOSqlite::GetIf(const TQDictionaryPredicate& predicate)
 {
 	TQDictionaryVec vec;

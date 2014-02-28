@@ -27,6 +27,7 @@ public:
 	virtual bool Delete(const TDictionaryID dicID);
 
 	virtual QDictionary GetByID(const TDictionaryID dicID);
+	virtual QDictionary GetByName(const std::string& name);
 
 	virtual TQDictionaryVec GetAll();
 	virtual TQDictionaryVec GetIf(const TQDictionaryPredicate& predicate);

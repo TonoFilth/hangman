@@ -114,6 +114,8 @@ public:
 // 								DICTIONARY DAO
 // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 // ///////////////////////////////////////////////////////////////////////////*/
+#include <iostream>
+using namespace std;
 class DictionaryDAO
 {
 protected:
@@ -146,7 +148,8 @@ public:
 	virtual bool Update(const QDictionary& dictionary)  = 0;
 	virtual bool Delete(const TDictionaryID dicID) 		= 0;
 
-	virtual QDictionary 	GetByID(const TDictionaryID dicID) = 0;
+	virtual QDictionary GetByID(const TDictionaryID dicID) = 0;
+	virtual QDictionary GetByName(const std::string& name) = 0;
 
 	virtual TQDictionaryVec GetAll() 						   			  = 0;
 	virtual TQDictionaryVec GetIf(const TQDictionaryPredicate& predicate) = 0;

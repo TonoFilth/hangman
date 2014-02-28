@@ -9,8 +9,7 @@ namespace fe
 
 class Dictionary;
 
-typedef std::shared_ptr<Dictionary> TDictionaryPtr;
-typedef std::vector<TDictionaryPtr>	TDictionaryVec;
+typedef std::vector<Dictionary>		TDictionaryVec;
 typedef std::vector<std::string>	TRandomStringVec;
 
 extern const std::string DEF_DICTIONARY_NAME;

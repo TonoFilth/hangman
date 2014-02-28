@@ -110,4 +110,67 @@ void StringUtils::Translate(string& str, const TStringVec& charsToTranslate, con
 		FindAndReplace(str, charsToTranslate[i], translatedChars[i]);
 }
 
+TStringVec StringUtils::Explode(const string& str, const string& delimiter)
+{
+	TStringVec vec;
+
+	auto lastPos = str.find_first_not_of(delimiter, 0);
+	auto pos     = str.find_first_of(delimiter, lastPos);
+
+	while (lastPos != string::npos || pos != string::npos)
+	{
+		vec.push_back(str.substr(lastPos, pos - lastPos));
+		lastPos = str.find_first_not_of(delimiter, pos);
+		pos     = str.find_first_of(delimiter, lastPos);
+	}
+
+	return vec;
+}
+
+TStringVec StringUtils::ExplodeOmitQuotes(const string& str, const string& delimiter)
+{
+	TStringVec vec;
+	vector<pair<string::size_type, string::size_type> > quotes;
+
+	auto quoteLastPos = str.find_first_of("\"", 0);
+	auto quotePos     = str.find_first_of("\"", quoteLastPos + 1);
+
+	while (quotePos != string::npos)
+	{
+		quotes.push_back(pair<string::size_type, string::size_type>(quoteLastPos, quotePos));
+		quoteLastPos = str.find_first_of("\"", quotePos + 1);
+		quotePos     = str.find_first_of("\"", quoteLastPos + 1);
+
+		if (quoteLastPos == string::npos)
+			quotePos = string::npos;
+	}
+
+	auto lastPos = str.find_first_not_of(delimiter, 0);
+	auto pos     = str.find_first_of(delimiter, lastPos);
+
+	while (lastPos != string::npos || pos != string::npos)
+	{
+		// If is between quotest
+		if (any_of(quotes.begin(), quotes.end(), [pos] (const pair<string::size_type, string::size_type> q)
+		{
+			if (pos >= q.first && pos <= q.second)
+				return true;
+			return false;
+		}))
+		{
+			if (pos == str.length() - 1)
+				break;
+
+			pos = str.find_first_of(delimiter, pos + 1);
+			continue;
+		}
+
+		vec.push_back(str.substr(lastPos, pos - lastPos));
+		lastPos = str.find_first_not_of(delimiter, pos);
+		pos     = str.find_first_of(delimiter, lastPos);
+	}
+
+	return vec;
+}
+
 }
