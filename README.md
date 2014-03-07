@@ -5,7 +5,7 @@ A not so simple hangman game
 
 ## Features
 1. Customizable hangman's body parts with **JSON**
-2. Words stored in a **database**, easily extendable
+2. Words, categories and dictionaries stored in a **database**, easily extendable
 3. **Multi-language** support
 
 ## Build and Run
