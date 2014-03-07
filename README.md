@@ -122,4 +122,16 @@ The default hangman JSON looks like this:
 }
 ```
 
+## Database utility
+The database utility allows the player to extend the word, category and dictionary bases.
+It can read files that contains new words, categories and dictionaries and store them in the database.
+
+**NOTE**: The database utility is under development. Usage information will be added at completion.
+
 ## Screenshots
+
+**NOTE**: The screenshots were taken from the current development state. The final game will not look like this.
+![alt tag](http://oi58.tinypic.com/2vn0ta0.jpg)  
+![alt tag](http://oi61.tinypic.com/o9fi3p.jpg)  
+![alt tag](http://oi62.tinypic.com/znlhsp.jpg)  
+![alt tag](http://oi59.tinypic.com/106fyq1.jpg)  
